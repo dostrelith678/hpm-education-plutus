@@ -4,4 +4,10 @@
 
 ## The EUTxO Model
 
-* [Page 2](the-eutxo-model/page-2.md)
+* [Introduction to the EUTxO model](the-eutxo-model/introduction-to-the-eutxo-model/README.md)
+  * [The UTxO (Unspent Transaction Output) model](the-eutxo-model/introduction-to-the-eutxo-model/the-utxo-unspent-transaction-output-model.md)
+  * [The EUTxO model (Extended UTxO) model](the-eutxo-model/introduction-to-the-eutxo-model/the-eutxo-model-extended-utxo-model.md)
+
+***
+
+* [References](references.md)
