@@ -8,6 +8,17 @@
   * [The UTxO (Unspent Transaction Output) model](the-eutxo-model/introduction-to-the-eutxo-model/the-utxo-unspent-transaction-output-model.md)
   * [The EUTxO model (Extended UTxO) model](the-eutxo-model/introduction-to-the-eutxo-model/the-eutxo-model-extended-utxo-model.md)
 
+## The Plutus Environment
+
+* [What is Plutus?](the-plutus-environment/what-is-plutus.md)
+* [System requirements for this course](the-plutus-environment/system-requirements-for-this-course.md)
+* [Setting up your Plutus development environment](the-plutus-environment/setting-up-your-plutus-development-environment.md)
+
 ***
 
 * [References](references.md)
+
+## Writing the first Plutus script
+
+* [General Notes](writing-the-first-plutus-script/general-notes.md)
+* [The Simplest Script](writing-the-first-plutus-script/the-simplest-script.md)
