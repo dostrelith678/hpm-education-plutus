@@ -14,11 +14,9 @@
 * [System requirements for this course](the-plutus-environment/system-requirements-for-this-course.md)
 * [Setting up your Plutus development environment](the-plutus-environment/setting-up-your-plutus-development-environment.md)
 
-***
+## Writing the first Plutus scripts
 
-* [References](references.md)
-
-## Writing the first Plutus script
-
-* [General Notes](writing-the-first-plutus-script/general-notes.md)
-* [The Simplest Script](writing-the-first-plutus-script/the-simplest-script.md)
+* [General Notes](writing-the-first-plutus-scripts/general-notes.md)
+* [The Simplest Script](writing-the-first-plutus-scripts/the-simplest-script.md)
+* [The Guessing Game Script](writing-the-first-plutus-scripts/the-guessing-game-script.md)
+* [References](writing-the-first-plutus-scripts/references.md)

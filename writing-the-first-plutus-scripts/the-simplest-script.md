@@ -121,7 +121,7 @@ writeSerialisedSuccessScript = writeFileTextEnvelope "compiled/simplestSuccess.p
 Load it up in `cabal repl` and compile the script:
 
 ```
-Prelude SimplestSuccessV2> SimplestSuccessV2.writeSerialisedSuccessScript 
+Prelude SimplestSuccess> SimplestSuccess.writeSerialisedSuccessScript 
 Right ()
 ```
 
@@ -192,9 +192,9 @@ cardano-cli address build \
 
 # Build script address
 cardano-cli address build \
---payment-script-file simplestSuccessV2.plutus \
+--payment-script-file simplestSuccess.plutus \
 --testnet-magic $NWMAGIC \
---out-file simplestSuccessV2.addr
+--out-file simplestSuccess.addr
 
 echo "Before continuing, request faucet funds to address: $(cat 01.addr)!"
 ```
@@ -212,7 +212,7 @@ funds_normal=$(cardano-cli query utxo \
 --testnet-magic $NWMAGIC)
 
 funds_script=$(cardano-cli query utxo \
---address $(cat simplestSuccessV2.addr) \
+--address $(cat simplestSuccess.addr) \
 --testnet-magic $NWMAGIC)
 
 echo "Normal address:"
@@ -222,7 +222,35 @@ echo "Script address:"
 echo "${funds_script}"
 ```
 
-3\) `spend-script-utxo.sh`
+3\) `send-funds-to-script.sh`
+
+```bash
+#!/usr/bin/env bash
+
+NWMAGIC=2 # preview testnet
+export CARDANO_NODE_SOCKET_PATH=$CNODE_HOME/sockets/node0.socket
+
+cardano-cli transaction build \
+    --testnet-magic $NWMAGIC \
+    --change-address $(cat ../normal_address/01.addr) \
+    --tx-in 29e96c103e6d26d9b8a110df9c8f82eaacbc53077d0b474b41fb4c0d0c0fca93#0 \
+    --tx-out $(cat simplestSuccess.addr)+2000000 \
+    --tx-out-datum-embed-file ../assets/unit.json \
+    --protocol-params-file ../normal_address/protocol.json \
+    --out-file tx.body
+
+cardano-cli transaction sign \
+    --tx-body-file tx.body \
+    --signing-key-file ../normal_address/01.skey \
+    --testnet-magic $NWMAGIC \
+    --out-file tx.signed
+
+cardano-cli transaction submit \
+    --testnet-magic $NWMAGIC \
+    --tx-file tx.signed
+```
+
+4\) `spend-script-utxo.sh`
 
 ```bash
 #!/usr/bin/env bash
@@ -234,8 +262,8 @@ cardano-cli transaction build \
     --testnet-magic $NWMAGIC \
     --change-address $(cat 01.addr) \
     --tx-in a34a0e1b93e258f3124614f990ce6751c3284963e840e2104e875fe39582638c#0 \
-    --tx-in-script-file simplestSuccessV2.plutus \
-    --tx-in-inline-datum-present \
+    --tx-in-script-file simplestSuccess.plutus \
+    --tx-in-datum-file ../assets/unit.json \
     --tx-in-redeemer-file ../assets/unit.json \
     --tx-in-collateral 61931f9f949bf8d1ef1e8b6b004fb7ea4cd80db3319247e2355ed08399af94f4#0 \
     --protocol-params-file protocol.json \
