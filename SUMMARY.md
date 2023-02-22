@@ -19,4 +19,10 @@
 * [General Notes](writing-the-first-plutus-scripts/general-notes.md)
 * [The Simplest Script](writing-the-first-plutus-scripts/the-simplest-script.md)
 * [The Guessing Game Script](writing-the-first-plutus-scripts/the-guessing-game-script.md)
+* [Exploring Transaction Context](writing-the-first-plutus-scripts/exploring-transaction-context.md)
 * [References](writing-the-first-plutus-scripts/references.md)
+
+## Typed validators
+
+* [Overview](typed-validators/overview.md)
+* [Shared Wallet Example](typed-validators/shared-wallet-example.md)
