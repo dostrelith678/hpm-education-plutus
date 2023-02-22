@@ -264,7 +264,7 @@ cardano-cli transaction sign \
 
 cardano-cli transaction submit \
     --testnet-magic $NWMAGIC \
-    --tx-file tx.signedhas
+    --tx-file tx.signed
 ```
 
 One important note is that in `spend-script-utxo.sh`, the transaction building command has to use the `--required-signer-hash` specifying one or the other key hashes on the datum of the UTxO we are spending. This is because the `build` command already has to run its validation for the script input, and unless we provide it with the required signer parameter, it cannot correctly check `txSignedBy` logic, as the transaction is not signed by any signature at this stage. It is a way of saying "evaluate this script under the assumption that the transaction _**WILL**_ be signed by this public key hash!".
