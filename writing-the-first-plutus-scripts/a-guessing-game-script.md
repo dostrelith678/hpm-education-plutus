@@ -1,4 +1,4 @@
-# The Guessing Game Script
+# A Guessing Game Script
 
 ## Exploring datum and redeemer in scripts
 

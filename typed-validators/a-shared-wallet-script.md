@@ -1,4 +1,4 @@
-# Shared Wallet Example
+# A Shared Wallet Script
 
 Now, we will look at an example of a typed validator. It will act as a shared wallet between two trusted parties, where unlocking funds is allowed if either of their signatures is present in the spending transaction. For this example, we will define the public key hashes of the two parties in the _**datum**_, and the validator will check that either of those hashes signed the transaction. We do not need to use the redeemer in this example, only the `datum` and `context`.
 
