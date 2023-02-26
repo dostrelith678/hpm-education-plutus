@@ -20,7 +20,6 @@
 * [The Simplest Script](writing-the-first-plutus-scripts/the-simplest-script.md)
 * [A Guessing Game Script](writing-the-first-plutus-scripts/a-guessing-game-script.md)
 * [Exploring Transaction Context](writing-the-first-plutus-scripts/exploring-transaction-context.md)
-* [References](writing-the-first-plutus-scripts/references.md)
 
 ## Typed validators
 
@@ -32,3 +31,22 @@
 * [Overview](parameterised-validators/overview.md)
 * [A Deadline Script](parameterised-validators/a-deadline-script.md)
 * [Another Shared Wallet Script](parameterised-validators/another-shared-wallet-script.md)
+
+## Stake Validators
+
+* [Overview](stake-validators/overview.md)
+* [A Stake Validator Script](stake-validators/a-stake-validator-script.md)
+
+## Minting Policies
+
+* [Overview](minting-policies/overview.md)
+* [A Pay-to-Store Policy](minting-policies/a-pay-to-store-policy.md)
+
+## Plutus Emulator
+
+* [Emulating the blockchain](plutus-emulator/emulating-the-blockchain.md)
+* [Testing a validator with the emulator](plutus-emulator/testing-a-validator-with-the-emulator.md)
+
+## References
+
+* [References](references/references.md)
