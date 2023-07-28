@@ -12,17 +12,15 @@ The Plutus Foundation provides the ledger with a way of specifying and executing
 
 The Plutus Application Framework provides support tools for writing applications in Plutus. It consists of several different tools such as:&#x20;
 
-_Plutus Playground_ - an online development environment featuring a code editor, graphical user interface, and evaluation visualisation.
-
 _Contract API_ - a component that provides an interface for writing the off-chain parts of Plutus applications. A useful tool that goes along is the _Contract monad emulator_ which is used to emulate a blockchain for testing contract instances.
 
 _Plutus Application Backend (PAB)_ - a web server library that manages the state of Plutus contract instances and executes the off-chain components of Plutus applications. It currently does so by interacting with the _cardano-wallet_ backend and _caradno-node_ components while providing a client/application interface for the Plutus application. Not really production ready yet (only hosted option available).
 
-_Various other libraries_ - provide a full framework for writing Plutus applications.
+_Various other libraries_ - provide a full framework for writing Plutus applications. A full list can be found here: [https://plutus-apps.readthedocs.io/en/latest/plutus/explanations/plutus-tools-component-descriptions.html#plutus-tools-in-development](https://plutus-apps.readthedocs.io/en/latest/plutus/explanations/plutus-tools-component-descriptions.html#plutus-tools-in-development).
 
 All these tools are located in the _plutus-apps_ repository ([https://github.com/input-output-hk/plutus-apps](https://github.com/input-output-hk/plutus-apps)).
 
-<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption><p>A high-level architecture of the Plutus Platform, with an emphasis on applications (<a href="https://playground.plutus.iohkdev.io/doc/plutus/explanations/platform.html">https://playground.plutus.iohkdev.io/doc/plutus/explanations/platform.html</a>).</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption><p>A high-level architecture of the Plutus Platform, with an emphasis on applications (<a href="https://playground.plutus.iohkdev.io/doc/plutus/explanations/platform.html">https://playground.plutus.iohkdev.io/doc/plutus/explanations/platform.html</a> - deprecated link).</p></figcaption></figure>
 
 ###
 
