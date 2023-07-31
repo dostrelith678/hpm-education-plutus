@@ -6,23 +6,19 @@ As mentioned in the [EUTxO overview](../the-eutxo-model/introduction-to-the-eutx
 2. redeemer
 3. context
 
-The haddock documentation for Plutus specifies the main modules ([https://playground.plutus.iohkdev.io/doc/haddock/](https://playground.plutus.iohkdev.io/doc/haddock/)):
+The haddock documentation for Plutus specifies the main modules ([https://input-output-hk.github.io/plutus/master/](https://input-output-hk.github.io/plutus/master/)):
 
 ```
 PlutusTx: Compiling Haskell to PLC (Plutus Core; on-chain code).
 
 PlutusTx.Prelude: Haskell prelude replacement compatible with PLC.
 
-Plutus.Contract: Writing Plutus apps (off-chain code).
+PlutusCore: Programming language in which scripts on the Cardano blockchain are written.
 
-Ledger.Constraints: Constructing and validating Plutus transactions. Built on PlutusTx and Plutus.Contract.
-
-Ledger.Typed.Scripts: A type-safe interface for spending and producing script outputs. Built on PlutusTx.
-
-Plutus.Trace.Emulator: Testing Plutus contracts in the emulator.
+UntypedPlutusCore: On-chain Plutus code.
 ```
 
-These are the modules that we will be importing into our Haskell files. We start with a new `SimplestSuccess.hs` file. We will **write the simplest contract that successfully validates every attempt to spend its funds**. First, we add some GHC extensions at the start of the file:
+The two modules that we will be importing into our Haskell files are `PlutusTx` and `PlutusTx.Prelude`. We start with a new `SimplestSuccess.hs` file. We will **write the simplest contract that successfully validates every attempt to spend its funds**. First, we add some GHC extensions at the start of the file:
 
 ```haskell
 {-# LANGUAGE DataKinds         #-} -- make any type constructor into a type
