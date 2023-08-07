@@ -2,11 +2,11 @@
 
 As mentioned in the [EUTxO overview](../the-eutxo-model/introduction-to-the-eutxo-model/the-eutxo-model-extended-utxo-model.md), the validator script receives three arguments:
 
-1. datum
-2. redeemer
-3. context
+1. `Datum`
+2. `Redeemer`
+3. `Context`
 
-The haddock documentation for Plutus specifies the main modules ([https://input-output-hk.github.io/plutus/master/](https://input-output-hk.github.io/plutus/master/)):
+The Haddock documentation for Plutus specifies the main modules ([https://input-output-hk.github.io/plutus/master/](https://input-output-hk.github.io/plutus/master/)):
 
 ```
 PlutusTx: Compiling Haskell to PLC (Plutus Core; on-chain code).
@@ -18,13 +18,19 @@ PlutusCore: Programming language in which scripts on the Cardano blockchain are 
 UntypedPlutusCore: On-chain Plutus code.
 ```
 
-The two modules that we will be importing into our Haskell files are `PlutusTx` and `PlutusTx.Prelude`. We start with a new `SimplestSuccess.hs` file. We will **write the simplest contract that successfully validates every attempt to spend its funds**. First, we add some GHC extensions at the start of the file:
+The two modules that we will be importing into our Haskell files are `PlutusTx` and `PlutusTx.Prelude`. We start with a new `SimplestSuccess.hs` file. We will **write the simplest contract that successfully validates every attempt to spend its funds**.
+
+### Writing the validator
+
+First, we will need to add some GHC extensions at the start of the file:
 
 ```haskell
 {-# LANGUAGE DataKinds         #-} -- make any type constructor into a type
 {-# LANGUAGE NoImplicitPrelude #-} -- do not import Prelude by default
 {-# LANGUAGE TemplateHaskell   #-} -- allows embedding domain-specific language into the Haskell host language
 ```
+
+The `DataKinds` extension is needed for some Template Haskell or the `PlutusTx` compilation will fail. `NoImplicitPrelude` states not to import the Haskell Prelude. We always need to specify this as `PlutusTx` has its own Prelude that we have to use. When writing the validator to a file, we still need to use the `IO` monad from the original Prelude, which we can import explicitly. The  `TemplateHaskell` extension is simply to allow us to write Template Haskell expressions to be able to properly use `PlutusTx.compile` inside our module.
 
 Next, we define our module name (same as the filename):
 
@@ -41,7 +47,7 @@ Next, we need to import the packages required for the compilation of our script.
 
 ```haskell
 import qualified PlutusTx                           -- main on-chain code module
-import qualified PlutusTx.Prelude                   -- Prelude replacement for Plutus
+import qualified PlutusTx.Prelude     as Prelude    -- Prelude replacement for Plutus
 import qualified Plutus.V2.Ledger.Api as Plutus     -- functions for working with scripts on the ledger
 
 -- this is not from Plutus but cardano-node https://input-output-hk.github.io/cardano-node/cardano-api/lib/Cardano-Api-Shelley.html
@@ -59,14 +65,16 @@ import Prelude (IO)
 In general, we want to **write three major parts** of our Haskell file:
 
 1. The `mkValidator` function that contains our validation logic.
-2. Compilation of that function to a Plutus Core script (the on-chain language). This is done by using template Haskell.
-3. Serialise the script and write the script to a `.plutus` file.
+2. Compilation of that function to a Plutus Core script (the on-chain language). This is done by using [template Haskell](http://wiki.haskell.org/Template\_Haskell).
+3. Serialise and write the script to a `.plutus` file.
 
-When we write a validator we define a function that receives the three aforementioned arguments and **returns a unit (`()`) if successful**. Not returning a `()` means that the validation failed and the transaction will be invalidated. With that in mind, we can start to think about the type signature of the validator function, something like:
+When we write a validator we define a function that receives the three aforementioned arguments and **returns a unit `()` if successful**. Not returning a `()` means that the validation failed and the transaction will be invalidated. With that in mind, we can start to think about the type signature of the validator function, something like:
 
 `mkValidator :: Datum -> Redeemer -> Context -> ()`.
 
-But what are the types of `Datum`, `Redeemer` and `Context`? It turns out that in Plutus, all three of the validation arguments need to come in a type of `Data`. We can explore the `haddock` pages to learn more about it: [https://playground.plutus.iohkdev.io/doc/haddock/plutus-core/html/PlutusCore-Data.html](https://playground.plutus.iohkdev.io/doc/haddock/plutus-core/html/PlutusCore-Data.html). We see that the `Data` type comes with several constructors, but the main takeaway is that it is a generic data type that can represent various things such as integers, byte strings, lists, and maps. Plutus also features a `BuiltinData` type ([https://playground.plutus.iohkdev.io/doc/haddock/plutus-tx/html/PlutusTx-Builtins.html#g:4](https://playground.plutus.iohkdev.io/doc/haddock/plutus-tx/html/PlutusTx-Builtins.html#g:4)) that can be used directly in the on-chain code.
+But what are the types of `Datum`, `Redeemer` and `Context`? It turns out that in Plutus, all three of the validation arguments need to come in a type of `Data`. We can explore the Haddock pages to learn more about it: [https://input-output-hk.github.io/plutus/master/plutus-core/html/PlutusCore-Data.html#t:Data](https://input-output-hk.github.io/plutus/master/plutus-core/html/PlutusCore-Data.html#t:Data).
+
+We see that the `Data` type comes with several constructors, but the main takeaway is that it is a generic data type that can represent various things such as integers, byte strings, lists, and maps. Plutus also features a `BuiltinData` type ([https://input-output-hk.github.io/plutus/master/plutus-tx/html/PlutusTx-Builtins.html#g:4](https://input-output-hk.github.io/plutus/master/plutus-tx/html/PlutusTx-Builtins.html#g:4)) that can be used directly in the on-chain code.
 
 So we can now write the type signature of our validator function using the `BuiltinData` type for its arguments and returning `()`: `mkValidator :: BuiltinData -> BuiltinData -> BuiltinData -> ()`
 
@@ -86,7 +94,7 @@ validator = Plutus.mkValidatorScript $$(PlutusTx.compile [|| mkValidator ||])
 
 The unusual syntax above is template Haskell: `$$([|| ||])`. The function `Plutus.mkValidatorScript` requires a Plutus Core argument so the `mkValidator` is first compiled to Plutus Core.
 
-Part 3 of our three steps is arguably the simplest. We need to unwrap the validator to get the script. This is just a necessary step to conform with the expected types. Since `Plutus.Validator` is a wrapper around `Plutus.script` which is used as the actual validator in the ledger, we need to unwrap it.
+Part 3 of our three steps is arguably the simplest. We need to unwrap the validator to get the script. This is just a necessary step to conform with the expected types. Since `Plutus.Validator` is a wrapper around `Plutus.Script` which is used as the actual validator in the ledger, we need to unwrap it.
 
 ```
 script :: Plutus.Script
@@ -114,14 +122,16 @@ writeSerialisedSuccessScript :: IO (Prelude.Either (FileError ()) ())
 writeSerialisedSuccessScript = writeFileTextEnvelope "compiled/simplestSuccess.plutus" Prelude.Nothing successScriptSerialised
 ```
 
-Load it up in `cabal repl` and compile the script:
+We can load up a `cabal repl`, and compile the script. Make sure you create the `compiled/` directory first.
 
 ```
 Prelude SimplestSuccess> SimplestSuccess.writeSerialisedSuccessScript 
 Right ()
 ```
 
-We now have the compiled script in `compiled/simplestSuccess.plutus`. Another thing we need is to serialise a `datum`. We need to use datums on script outputs as any UTxO without a datum hash attached will be unspendable as we mentioned before. We need to write a utility function for converting Plutus data to JSON because `cardano-cli` expects JSON values. Create a new file under `src/helpers/Utils.hs`:
+### Serialising a datum object
+
+We now have the compiled script in `compiled/simplestSuccess.plutus`. Another thing we need is to serialise a `datum`. We need to use datums on script outputs as **any UTxO without a datum hash attached will be unspendable** as we mentioned before. We need to write a utility function for converting Plutus data to JSON because `cardano-cli` expects JSON values. Create a new file under `src/helpers/Utils.hs`:
 
 ```haskell
 {-# LANGUAGE DataKinds         #-}
@@ -151,11 +161,13 @@ writeJSONData :: PlutusTx.ToData a => String -> a -> IO ()
 writeJSONData filePath pData = LBS.writeFile filePath $ plutusDataToJSON pData
 ```
 
-We can now load and use this function to write a unit `()` datum file.
+We can now load and use this function to write a unit `()` datum file. Make sure your create the `compiled/assets/` directory first.
 
 ```
 Prelude Utils> writeJSONData "compiled/assets/unit.json" ()
 ```
+
+### Testing the validator
 
 To use the script, we can make some `bash` scripts (it is also possible to utilise `cardano-cli` directly):
 
@@ -275,5 +287,7 @@ cardano-cli transaction submit \
     --testnet-magic $NWMAGIC \
     --tx-file tx.signed
 ```
+
+### Practice!
 
 It is important to practice on your own. Try using the materials above to write and test a Plutus script that always fails (a sort of token-burning script) from scratch.

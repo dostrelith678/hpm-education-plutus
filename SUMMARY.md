@@ -13,10 +13,12 @@
 * [What is Plutus?](the-plutus-environment/what-is-plutus.md)
 * [System requirements for this course](the-plutus-environment/system-requirements-for-this-course.md)
 * [Setting up your Plutus development environment](the-plutus-environment/setting-up-your-plutus-development-environment.md)
+* [Cabal project files](the-plutus-environment/cabal-project-files.md)
 
 ## Writing the first Plutus scripts
 
 * [General Notes](writing-the-first-plutus-scripts/general-notes.md)
+* [Cabal setup](writing-the-first-plutus-scripts/cabal-setup.md)
 * [The Simplest Script](writing-the-first-plutus-scripts/the-simplest-script.md)
 * [A Guessing Game Script](writing-the-first-plutus-scripts/a-guessing-game-script.md)
 * [Exploring Transaction Context](writing-the-first-plutus-scripts/exploring-transaction-context.md)

@@ -7,4 +7,4 @@ To fully follow the course, you will need a running `cardano-node` instance on o
 
 ### Setting up cardano-node
 
-There are many ways to set up a `cardano-node`. This guide favours the use of the guild operators' guide: [https://cardano-community.github.io/guild-operators](https://cardano-community.github.io/guild-operators/). To avoid building the binaries, you can use the already compiled binaries from IOG (found on the `cardano-node` release pages) instead. A short video will be available that follows the instructions as well.
+There are many ways to set up a `cardano-node`. This guide favours the use of the guild operators' guide: [https://cardano-community.github.io/guild-operators](https://cardano-community.github.io/guild-operators/). To avoid building the binaries yourself, you can use the already compiled binaries from IOG (found on the `cardano-node` release pages) instead. This is also explained in the guild operators' guide. A short video will be available that follows the instructions as well.
