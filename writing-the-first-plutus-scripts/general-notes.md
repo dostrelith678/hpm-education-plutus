@@ -7,7 +7,7 @@ Creating and executing Plutus scripts can be summarised in a couple of steps:
 * Write your Plutus on-chain code.
 * Serialize your Plutus on-chain code to the text envelope format (`cardano-cli` expects this format).
 * Create your transaction with the accompanying Plutus script(s). This must include a datum, either a datum hash or an inlinable datum. Important: any script UTxO without a datum is **UNSPENDABLE**.
-* Submit the transaction to execute and test the Plutus script. This needs to include the collateral input to cover costs in case the transaction fails. The transaction should never fail this way except in a very particular edge case where the UTxO trying to be spent has been spent in the meantime before the block with the transaction propagates through the network.
+* Submit the transaction to execute and test the Plutus script. This needs to include the collateral input to cover costs in case the transaction fails. The transaction should never fail this way except in a very particular edge case where the UTxO trying to be spent has been spent in the meantime before the block with the transaction propagates through the network. Important: only _regular_ address inputs can be used as collateral (those with an associated key pair). **Script address inputs cannot be used as collateral.**
 * We will also look at another way of testing Plutus scripts by emulating the blockchain at the end of the course.
 
 ### PlutusV2

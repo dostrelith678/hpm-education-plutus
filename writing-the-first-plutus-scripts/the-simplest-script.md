@@ -119,7 +119,7 @@ Finally, we expose a function that writes the `Plutus` script to a file that we 
 
 ```
 writeSerialisedSuccessScript :: IO (Prelude.Either (FileError ()) ())
-writeSerialisedSuccessScript = writeFileTextEnvelope "compiled/simplestSuccess.plutus" Prelude.Nothing successScriptSerialised
+writeSerialisedSuccessScript = writeFileTextEnvelope "compiled/SimplestSuccess.plutus" Prelude.Nothing successScriptSerialised
 ```
 
 We can load up a `cabal repl`, and compile the script. Make sure you create the `compiled/` directory first.
@@ -169,47 +169,62 @@ Prelude Utils> writeJSONData "compiled/assets/unit.json" ()
 
 ### Testing the validator
 
-To use the script, we can make some `bash` scripts (it is also possible to utilise `cardano-cli` directly):
+To start testing our validators, we will need to create some regular Cardano addresses on the testnet and use the faucet to get some tADA. We will use these to pay the fees for the transactions we create as well as the collateral inputs. We will build two addresses now and use them throughout the course with different validators. Let's place all our testing files in the `testnet/` directory of the project root. Below is a `bash` script that creates the addresses for us (you can also use `cardano-cli` directly). Make sure you create the `testnet/addresses/` directory beforehand.
 
-1\) `create-addresses.sh`
-
-```bash
-#!/usr/bin/env bash
-
+<pre class="language-bash"><code class="lang-bash"><strong># testnet/create-addresses.sh
+</strong><strong>
+</strong><strong>#!/usr/bin/env bash
+</strong>
 NWMAGIC=2 # preview testnet
 
 # Build normal address 1
 cardano-cli address key-gen \
---verification-key-file ../normal_address/01.vkey \
---signing-key-file ../normal_address/01.skey
+--verification-key-file ./address/01.vkey \
+--signing-key-file ./address/01.skey
 
 cardano-cli address build \
---payment-verification-key-file ../normal_address/01.vkey \
+--payment-verification-key-file ./address/01.vkey \
 --testnet-magic $NWMAGIC \
---out-file ../normal_address/01.addr
+--out-file ./address/01.addr
 
 # Build normal address 2
 cardano-cli address key-gen \
---verification-key-file ../normal_address/02.vkey \
---signing-key-file ../normal_address/02.skey
+--verification-key-file ./address/02.vkey \
+--signing-key-file ./address/02.skey
 
 cardano-cli address build \
---payment-verification-key-file ../normal_address/02.vkey \
+--payment-verification-key-file ./address/02.vkey \
 --testnet-magic $NWMAGIC \
---out-file ../normal_address/02.addr
+--out-file ./address/02.addr
+
+echo "Before continuing, request faucet funds to address: $(cat address/01.addr)!"
+
+</code></pre>
+
+Once done, we need to request funds to our new address from the faucet: [https://docs.cardano.org/cardano-testnet/tools/faucet/](https://docs.cardano.org/cardano-testnet/tools/faucet/). Make sure you select the right network for the transaction, we are using `preview` in this course.
+
+The two addresses we created will be shared among all the validators we test. Now we need to create a _script address_ for our `SimplestSuccess` validator. For each validator we test, we will place the testing resources under a new directory specific to that validator. For `SimplestSuccess`, that will be `testnet/SimplestSuccess/`. After creating the directory, let's build the script address. Note that here we do not specify a key pair for the address, but instead a script file that acts as the validator for that address.
+
+```bash
+# testnet/SimplestSuccess/build-script-address.sh
+
+#!/usr/bin/env bash
+
+NWMAGIC=2 # preview testnet
 
 # Build script address
 cardano-cli address build \
---payment-script-file simplestSuccess.plutus \
+--payment-script-file ../../compiled/SimplestSuccess.plutus \
 --testnet-magic $NWMAGIC \
---out-file simplestSuccess.addr
+--out-file SimplestSuccess.addr
 
-echo "Before continuing, request faucet funds to address: $(cat 01.addr)!"
 ```
 
-2\) `check-utxos.sh`
+We can also build a convenience script to check the UTxOs at our addresses.
 
 ```bash
+# testnet/SimplestSuccess/check-utxos.sh
+
 #!/usr/bin/env bash
 
 NWMAGIC=2 # preview testnet
@@ -230,9 +245,13 @@ echo "Script address:"
 echo "${funds_script}"
 ```
 
-3\) `send-funds-to-script.sh`
+We will see something interesting when we check the UTxOs. Our normal address has just a single UTxO on it, which is the transaction from the faucet, and that is expected. But the script address has a lot of UTxOs on it. You might have expected it to have no UTxOs as we just created it. But it turns out, this is a common script whose address was already created and used on this testnet. Of course, if two or more people write scripts with the same compilation result (the same Plutus Core code that is executed on-chain), then the address created from that script will also be the same. This is because a script address is simply the hash of the script code.
+
+Since we know there are already UTxOs sitting at the script address, we do not really need to send any funds to it in order to test that we can spend them back. We can just use any of the existing UTxOs since the script allows any UTxO sitting on it to be spent. We will still create a script for sending funds to the script for completeness. Note that as we mentioned before, any script UTxO without a datum attached is _**UNSPENDABLE**_ (go ahead and try spending one), so never forget to attach a datum when sending funds to a script. The `--tx-in` argument will be the UTxO from our normal address so you need to change it accordingly. For datum, we will simply embed the `unit.json` that we created earlier. Finally, we need to sign the transaction with the private key of the `01.addr`.
 
 ```bash
+# testnet/SimplestSuccess/send-funds-to-script.sh
+
 #!/usr/bin/env bash
 
 NWMAGIC=2 # preview testnet
@@ -240,16 +259,15 @@ export CARDANO_NODE_SOCKET_PATH=$CNODE_HOME/sockets/node0.socket
 
 cardano-cli transaction build \
     --testnet-magic $NWMAGIC \
-    --change-address $(cat ../normal_address/01.addr) \
-    --tx-in 29e96c103e6d26d9b8a110df9c8f82eaacbc53077d0b474b41fb4c0d0c0fca93#0 \
-    --tx-out $(cat simplestSuccess.addr)+2000000 \
-    --tx-out-datum-embed-file ../assets/unit.json \
-    --protocol-params-file ../normal_address/protocol.json \
+    --change-address $(cat ../address/01.addr) \
+    --tx-in 2326577336a90f71738aab4803b3f1ae9107d0ddeb107fc4bf926b24e95930ad#0 \
+    --tx-out $(cat SimplestSuccess.addr)+2000000 \
+    --tx-out-datum-embed-file ../../compiled/assets/unit.json \
     --out-file tx.body
 
 cardano-cli transaction sign \
     --tx-body-file tx.body \
-    --signing-key-file ../normal_address/01.skey \
+    --signing-key-file ../address/01.skey \
     --testnet-magic $NWMAGIC \
     --out-file tx.signed
 
@@ -258,9 +276,11 @@ cardano-cli transaction submit \
     --tx-file tx.signed
 ```
 
-4\) `spend-script-utxo.sh`
+Now we want to see if we can spend a UTxO from the script. Good luck finding the one you just sent to it. You can just pick a random one that has a datum from the UTxO list instead. This time, we must include a collateral UTxO, which must be from a regular address as we mentioned before. Change the `--tx-in` and `--tx-in-collateral` accordingly.
 
 ```bash
+# testnet/SimplestSuccess/spend-script-utxo.sh
+
 #!/usr/bin/env bash
 
 NWMAGIC=2 # preview testnet
@@ -268,24 +288,38 @@ export CARDANO_NODE_SOCKET_PATH=$CNODE_HOME/sockets/node0.socket
 
 cardano-cli transaction build \
     --testnet-magic $NWMAGIC \
-    --change-address $(cat 01.addr) \
-    --tx-in a34a0e1b93e258f3124614f990ce6751c3284963e840e2104e875fe39582638c#0 \
-    --tx-in-script-file simplestSuccess.plutus \
-    --tx-in-datum-file ../assets/unit.json \
-    --tx-in-redeemer-file ../assets/unit.json \
-    --tx-in-collateral 61931f9f949bf8d1ef1e8b6b004fb7ea4cd80db3319247e2355ed08399af94f4#0 \
-    --protocol-params-file protocol.json \
+    --change-address $(cat ../address/01.addr) \
+    --tx-in ea340a31a9ad4dd059e6743274607e2cc7bdb7b12b5345be8bc81988d9a6ea86#0 \
+    --tx-in-script-file ../../compiled/SimplestSuccess.plutus \
+    --tx-in-datum-file ../../compiled/assets/unit.json \
+    --tx-in-redeemer-file ../../compiled/assets/unit.json \
+    --tx-in-collateral ea340a31a9ad4dd059e6743274607e2cc7bdb7b12b5345be8bc81988d9a6ea86#1 \
     --out-file tx.body
 
 cardano-cli transaction sign \
     --tx-body-file tx.body \
-    --signing-key-file 01.skey \
+    --signing-key-file ../address/01.skey \
     --testnet-magic $NWMAGIC \
     --out-file tx.signed
 
 cardano-cli transaction submit \
     --testnet-magic $NWMAGIC \
     --tx-file tx.signed
+
+```
+
+After the transaction is successfully submitted and processed, we can confirm that our `01.addr` received the funds from the script and our collateral was not spent.
+
+```bash
+./check-utxos.sh
+```
+
+```bash
+Normal address:
+                           TxHash                                 TxIx        Amount
+--------------------------------------------------------------------------------------
+ea340a31a9ad4dd059e6743274607e2cc7bdb7b12b5345be8bc81988d9a6ea86     1        9997830891 lovelace + TxOutDatumNone
+ee346be463426509daec07aba24a8905c5f55965daebb39f842a49191d83f9e1     0        1829006 lovelace + TxOutDatumNone
 ```
 
 ### Practice!
