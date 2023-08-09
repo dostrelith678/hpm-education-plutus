@@ -79,11 +79,12 @@ We see that the `Data` type comes with several constructors, but the main takeaw
 So we can now write the type signature of our validator function using the `BuiltinData` type for its arguments and returning `()`: `mkValidator :: BuiltinData -> BuiltinData -> BuiltinData -> ()`
 
 ```
+{-# INLINABLE mkValidator #-}
 mkValidator :: Prelude.BuiltinData -> Prelude.BuiltinData -> Prelude.BuiltinData -> ()
 mkValidator _ _ _ = ()
 ```
 
-Since this function always returns `()` regardless of its arguments, any UTxO belonging to the script will be spendable by any transaction.
+Since this function always returns `()` regardless of its arguments, any UTxO belonging to the script will be spendable by any transaction. We add the inlinable pragma just above the function to be able to later use it with the PlutusTx compiler directly in our Haskell code.
 
 We now need to do part 2 of our three steps, compiling this validator function to Plutus Core:
 
@@ -92,7 +93,7 @@ validator :: Plutus.Validator
 validator = Plutus.mkValidatorScript $$(PlutusTx.compile [|| mkValidator ||])
 ```
 
-The unusual syntax above is template Haskell: `$$([|| ||])`. The function `Plutus.mkValidatorScript` requires a Plutus Core argument so the `mkValidator` is first compiled to Plutus Core.
+The unusual syntax above is template Haskell: `$$([|| ||])`. The function `Plutus.mkValidatorScript` requires a Plutus Core argument so the `mkValidator` is first compiled to Plutus Core. In order for this to work, the compiled function `mkValidator` must be made inlinable with `{-# INLINABLE mkValidator #-}` that we did earlier.
 
 Part 3 of our three steps is arguably the simplest. We need to unwrap the validator to get the script. This is just a necessary step to conform with the expected types. Since `Plutus.Validator` is a wrapper around `Plutus.Script` which is used as the actual validator in the ledger, we need to unwrap it.
 
@@ -171,6 +172,10 @@ Prelude Utils> writeJSONData "compiled/assets/unit.json" ()
 
 To start testing our validators, we will need to create some regular Cardano addresses on the testnet and use the faucet to get some tADA. We will use these to pay the fees for the transactions we create as well as the collateral inputs. We will build two addresses now and use them throughout the course with different validators. Let's place all our testing files in the `testnet/` directory of the project root. Below is a `bash` script that creates the addresses for us (you can also use `cardano-cli` directly). Make sure you create the `testnet/addresses/` directory beforehand.
 
+{% hint style="warning" %}
+_**We always test our validators from OUTSIDE the nix-shell, i.e. with our local node that is synced. The nix-shell provides ONLY a development environment for writing and serialising Plutus validators.**_
+{% endhint %}
+
 <pre class="language-bash"><code class="lang-bash"><strong># testnet/create-addresses.sh
 </strong><strong>
 </strong><strong>#!/usr/bin/env bash
@@ -201,6 +206,13 @@ echo "Before continuing, request faucet funds to address: $(cat address/01.addr)
 
 </code></pre>
 
+To run the script, we first have to make it an executable:
+
+```
+chmod +x create-addressses.sh
+./create-addressses.sh
+```
+
 Once done, we need to request funds to our new address from the faucet: [https://docs.cardano.org/cardano-testnet/tools/faucet/](https://docs.cardano.org/cardano-testnet/tools/faucet/). Make sure you select the right network for the transaction, we are using `preview` in this course.
 
 The two addresses we created will be shared among all the validators we test. Now we need to create a _script address_ for our `SimplestSuccess` validator. For each validator we test, we will place the testing resources under a new directory specific to that validator. For `SimplestSuccess`, that will be `testnet/SimplestSuccess/`. After creating the directory, let's build the script address. Note that here we do not specify a key pair for the address, but instead a script file that acts as the validator for that address.
@@ -217,7 +229,6 @@ cardano-cli address build \
 --payment-script-file ../../compiled/SimplestSuccess.plutus \
 --testnet-magic $NWMAGIC \
 --out-file SimplestSuccess.addr
-
 ```
 
 We can also build a convenience script to check the UTxOs at our addresses.
@@ -231,11 +242,11 @@ NWMAGIC=2 # preview testnet
 export CARDANO_NODE_SOCKET_PATH=$CNODE_HOME/sockets/node0.socket
 
 funds_normal=$(cardano-cli query utxo \
---address $(cat 01.addr) \
+--address $(cat ../address/01.addr) \
 --testnet-magic $NWMAGIC)
 
 funds_script=$(cardano-cli query utxo \
---address $(cat simplestSuccess.addr) \
+--address $(cat SimplestSuccess.addr) \
 --testnet-magic $NWMAGIC)
 
 echo "Normal address:"
@@ -248,6 +259,10 @@ echo "${funds_script}"
 We will see something interesting when we check the UTxOs. Our normal address has just a single UTxO on it, which is the transaction from the faucet, and that is expected. But the script address has a lot of UTxOs on it. You might have expected it to have no UTxOs as we just created it. But it turns out, this is a common script whose address was already created and used on this testnet. Of course, if two or more people write scripts with the same compilation result (the same Plutus Core code that is executed on-chain), then the address created from that script will also be the same. This is because a script address is simply the hash of the script code.
 
 Since we know there are already UTxOs sitting at the script address, we do not really need to send any funds to it in order to test that we can spend them back. We can just use any of the existing UTxOs since the script allows any UTxO sitting on it to be spent. We will still create a script for sending funds to the script for completeness. Note that as we mentioned before, any script UTxO without a datum attached is _**UNSPENDABLE**_ (go ahead and try spending one), so never forget to attach a datum when sending funds to a script. The `--tx-in` argument will be the UTxO from our normal address so you need to change it accordingly. For datum, we will simply embed the `unit.json` that we created earlier. Finally, we need to sign the transaction with the private key of the `01.addr`.
+
+{% hint style="warning" %}
+_**Note that for all the bash scripts in this course, you will need to change the --tx-in arguments to match your own UTxOs. If you have not maintained the same directory structure as outlined in the course, you will need to change those paths accordingly as well.**_
+{% endhint %}
 
 ```bash
 # testnet/SimplestSuccess/send-funds-to-script.sh
@@ -305,7 +320,6 @@ cardano-cli transaction sign \
 cardano-cli transaction submit \
     --testnet-magic $NWMAGIC \
     --tx-file tx.signed
-
 ```
 
 After the transaction is successfully submitted and processed, we can confirm that our `01.addr` received the funds from the script and our collateral was not spent.
