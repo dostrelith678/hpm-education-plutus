@@ -132,13 +132,13 @@ Right ()
 
 ### Serialising a datum object
 
-We now have the compiled script in `compiled/simplestSuccess.plutus`. Another thing we need is to serialise a `datum`. We need to use datums on script outputs as **any UTxO without a datum hash attached will be unspendable** as we mentioned before. We need to write a utility function for converting Plutus data to JSON because `cardano-cli` expects JSON values. Create a new file under `src/helpers/Utils.hs`:
+We now have the compiled script in `compiled/simplestSuccess.plutus`. Another thing we need is to serialise a `datum`. We need to use datums on script outputs as **any UTxO without a datum hash attached will be unspendable** as we mentioned before. We need to write a utility function for converting Plutus data to JSON because `cardano-cli` expects JSON values. Create a new file under `src/Helpers/Utils.hs`:
 
 ```haskell
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Utils
+module Helpers.Utils
   (
     plutusDataToJSON,
     writeJSONData
@@ -164,16 +164,32 @@ writeJSONData filePath pData = LBS.writeFile filePath $ plutusDataToJSON pData
 
 We can now load and use this function to write a unit `()` datum file. Make sure your create the `compiled/assets/` directory first.
 
+<pre class="language-haskell"><code class="lang-haskell"><strong>Prelude> :l src/Helpers/Utils.hs
+</strong><strong>Ok, one module loaded.
+</strong><strong>Prelude Utils> writeJSONData "compiled/assets/unit.json" ()
+</strong></code></pre>
+
+{% hint style="info" %}
+Every time we want to automatically load a module we write when launching a `cabal repl`, we can add them to our `.cabal` file in the `exposed-modules` field.
+
+```haskell
+-- hpm-validators.cabal
+
+...
+library
+    hs-source-dirs:       src
+    exposed-modules:      SimplestSuccess
+                        , Helpers.Utils
+...
 ```
-Prelude Utils> writeJSONData "compiled/assets/unit.json" ()
-```
+{% endhint %}
 
 ### Testing the validator
 
 To start testing our validators, we will need to create some regular Cardano addresses on the testnet and use the faucet to get some tADA. We will use these to pay the fees for the transactions we create as well as the collateral inputs. We will build two addresses now and use them throughout the course with different validators. Let's place all our testing files in the `testnet/` directory of the project root. Below is a `bash` script that creates the addresses for us (you can also use `cardano-cli` directly). Make sure you create the `testnet/addresses/` directory beforehand.
 
 {% hint style="warning" %}
-_**We always test our validators from OUTSIDE the nix-shell, i.e. with our local node that is synced. The nix-shell provides ONLY a development environment for writing and serialising Plutus validators.**_
+_**We always test our validators from OUTSIDE the**** ****`nix-shell`****, i.e. with our local node that is synced. The**** ****`nix-shell`**** ****provides ONLY a development environment for writing and serialising Plutus validators.**_
 {% endhint %}
 
 <pre class="language-bash"><code class="lang-bash"><strong># testnet/create-addresses.sh
@@ -212,6 +228,10 @@ To run the script, we first have to make it an executable:
 chmod +x create-addressses.sh
 ./create-addressses.sh
 ```
+
+{% hint style="info" %}
+We will always need to make any `bash` scripts we intend to run executable first with the above command `chmod +x <script-name>.sh`.
+{% endhint %}
 
 Once done, we need to request funds to our new address from the faucet: [https://docs.cardano.org/cardano-testnet/tools/faucet/](https://docs.cardano.org/cardano-testnet/tools/faucet/). Make sure you select the right network for the transaction, we are using `preview` in this course.
 

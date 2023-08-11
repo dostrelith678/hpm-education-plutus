@@ -42,7 +42,21 @@ writeSerialisedScript :: IO (Either (FileError ()) ())
 writeSerialisedScript = writeFileTextEnvelope "compiled/GuessingGame.plutus" Nothing scriptSerialised
 ```
 
+{% hint style="info" %}
+Every time we want to automatically load a module we write when launching a `cabal repl`, we can add them to our `.cabal` file in the `exposed-modules` field.
 
+```haskell
+-- hpm-validators.cabal
+
+...
+library
+    hs-source-dirs:       src
+    exposed-modules:      SimplestSuccess
+                        , GuessingGame
+                        , Helpers.Utils
+...
+```
+{% endhint %}
 
 ### Testing the validator
 
@@ -86,7 +100,16 @@ No error message, and our datum is compiled under `compiled/assets/secretGuess.j
 
 We are now ready to test the validator! Create a new directory `testnet/GuessingGame` for this purpose.
 
-First, we need to create an address for this validator like before:
+Let's compile the validator as well.
+
+```haskell
+-- The following line is not necessary if the module was added to exposed-modules in the .cabal file
+Prelude> :l src/GuessingGame.hs
+Prelude> GuessingGame.writeSerialisedScript
+Right ()
+```
+
+Now, we need to create an address for this validator like before:
 
 ```sh
 # testnet/GuessingGame/create-script-address.sh
@@ -130,8 +153,6 @@ echo "${funds_script}"
 ```
 
 Again, we will see existing UTxOs present on the script address, as someone has already compiled and used it. Let's send some value to the script along with our secret datum.
-
-
 
 ```bash
 # testnet/GuessingGame/set-guess-utxo.sh

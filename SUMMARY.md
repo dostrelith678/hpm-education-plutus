@@ -21,7 +21,7 @@
 * [Cabal setup](writing-the-first-plutus-scripts/cabal-setup.md)
 * [The Simplest Script](writing-the-first-plutus-scripts/the-simplest-script.md)
 * [A Guessing Game Script](writing-the-first-plutus-scripts/a-guessing-game-script.md)
-* [Exploring Transaction Context](writing-the-first-plutus-scripts/exploring-transaction-context.md)
+* [Exploring Script Context](writing-the-first-plutus-scripts/exploring-transaction-context.md)
 
 ## Typed validators
 
