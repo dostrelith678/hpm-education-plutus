@@ -9,8 +9,8 @@ We can start off by creating our datum type, `SharedDatum`, and the correspondin
 ```haskell
 -- create a new datum type
 data SharedDatum = SharedDatum {
-    wallet1 :: PubKeyHash,
-    wallet2 :: PubKeyHash
+    wallet1 :: Plutus.PubKeyHash,
+    wallet2 :: Plutus.PubKeyHash
   }
 PlutusTx.unstableMakeIsData ''SharedDatum
 
@@ -19,6 +19,16 @@ data SharedWalletValidator
 instance Scripts.ValidatorTypes SharedWalletValidator where
   type instance DatumType SharedWalletValidator = SharedDatum
   type instance RedeemerType SharedWalletValidator = ()
+```
+
+Make sure that you import the `Scripts` package as:
+
+```haskell
+...
+
+import qualified Ledger.Typed.Scripts as Scripts
+
+...
 ```
 
 Next, we need to write the `mkValidator` logic. As before, we need to destructure the transaction context to get `TxInfo`, and use the [`txSignedBy` ](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V2-Ledger-Contexts.html#v:txSignedBy)function from `Plutus.V2.Ledger.Contexts` to check for the signature. `txSignedBy` accepts two arguments, one of type `TxInfo` and the other `PubKeyHash`, returning `True` if the signature is present:
@@ -51,7 +61,17 @@ mkValidator sdat _ ctx = checkSignature1 || checkSignature2
     checkSignature2 = traceIfFalse "signature 2 missing" $ txSignedBy info signature2
 ```
 
-Now we have a function of type `SharedDatum -> () -> Plutus.ScriptContext -> Bool`, but remember that we always have to get down to the Untyped Plutus Core version of a validator: `BuiltinData -> BuiltinData -> BuiltinData -> ()`. So with typed validators, we have to do some extra steps to get there. Instead of the simple `Plutus.mkValidatorScript`, we need to use `PSU.V2.mkTypedValidator` (from `Plutus.Script.Utils.V2.Typed.Scripts`). The type signature of `PSU.V2.mkTypedValidator` is:
+Make sure to import the `txSignedBy` function:
+
+```haskell
+...
+
+import Plutus.V2.Ledger.Contexts (txSignedBy)
+
+...
+```
+
+Now we have a function of type `SharedDatum -> () -> Plutus.ScriptContext -> Bool`, but remember that we always have to get down to the Untyped Plutus Core version of a validator: `BuiltinData -> BuiltinData -> BuiltinData -> ()`. So with typed validators, we have to do some extra steps to get there. Instead of the simple `Plutus.mkValidatorScript`, we need to use `PSU.V2.mkTypedValidator` (from `Plutus.Script.Utils.V2.Typed.Scripts` which we also need to import). The type signature of `PSU.V2.mkTypedValidator` is:
 
 ```haskell
 -- | Make a 'TypedValidator' from the 'CompiledCode' of a validator script and its wrapper.
@@ -83,10 +103,21 @@ typedValidator = PSU.V2.mkTypedValidator @Shared
         wrap = PSU.mkUntypedValidator
 ```
 
+Make sure that the `plutus-script-utils` packages are imported:
+
+```haskell
+...
+
+import qualified Plutus.Script.Utils.V2.Typed.Scripts as PSU.V2
+import qualified Plutus.Script.Utils.Typed as PSU
+
+...
+```
+
 From there, the rest is the same as before with only a minor difference in getting the actual validator and its hash. When compiling untyped validators, we got a type of `Plutus.Validator` as the compilation result. However, with `TypedValidator` we get a type that has multiple fields so we need to destructure it first to get to `Plutus.Script` type that we can use to serialise the script:
 
 ```haskell
-validator :: Plutus.Validator  -- uses tvValidator to get the validator
+validator :: Plutus.Validator  -- uses tvValidator field to get the validator
 validator = PSU.V2.validatorScript typedValidator
 
 script :: Plutus.Script -- gets the hash
@@ -104,6 +135,32 @@ scriptSerialised = PlutusScriptSerialised scriptShortBs
 
 writeSerialisedScript :: IO (Either (FileError ()) ())
 writeSerialisedScript = writeFileTextEnvelope "compiled/SharedWallet.plutus" Nothing scriptSerialised
+```
+
+For reference, here is the full list of imports for this module:
+
+```haskell
+...
+
+import qualified PlutusTx
+import PlutusTx.Prelude
+import qualified Plutus.V2.Ledger.Api as Plutus
+
+import Cardano.Api.Shelley (PlutusScript (PlutusScriptSerialised), PlutusScriptV2, writeFileTextEnvelope)
+import Cardano.Api (FileError)
+
+import qualified Data.ByteString.Lazy as LBS
+import qualified Data.ByteString.Short as SBS
+import Codec.Serialise
+
+import qualified Ledger.Typed.Scripts as Scripts
+import qualified Plutus.Script.Utils.V2.Typed.Scripts as PSU.V2
+import qualified Plutus.Script.Utils.Typed as PSU
+import Plutus.V2.Ledger.Contexts (txSignedBy)
+
+import Prelude (IO)
+
+...
 ```
 
 ### Serialising a custom datum type
