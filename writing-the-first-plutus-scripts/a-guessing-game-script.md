@@ -8,6 +8,8 @@ For our next script, we will use the `datum` and `redeemer` arguments instead of
 import PlutusTx.Prelude
 ```
 
+### Writing the validator
+
 We rename our module and exposed functions. Let's remove the script name from the exposed generic functions for serialising and writing the script to disk and just call them `scriptSerialised` and `writeSerialisedScript`:
 
 ```haskell

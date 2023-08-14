@@ -1,6 +1,8 @@
 # A Shared Wallet Script
 
-Now, we will look at an example of a typed validator. It will act as a shared wallet between two trusted parties, where unlocking funds is allowed if either of their signatures is present in the spending transaction. For this example, we will define the public key hashes of the two parties in the _**datum**_, and the validator will check that either of those hashes signed the transaction. We do not need to use the redeemer in this example, only the `datum` and `context`.
+Now, we will write our first typed validator. It will act as a shared wallet between two trusted parties, where unlocking funds is allowed if either of their signatures is present in the spending transaction. For this example, we will define the public key hashes of the two parties in the _**datum**_, and the validator will check that either of those hashes signed the transaction. We do not need to use the redeemer in this example, only the `datum` and `context`.
+
+### Writing the validator
 
 We can start off by creating our datum type, `SharedDatum`, and the corresponding `ValidatorTypes`, `Shared`. `SharedDatum` will have two fields, each corresponding to a `PubKeyHash` of one of the parties.
 
@@ -13,13 +15,13 @@ data SharedDatum = SharedDatum {
 PlutusTx.unstableMakeIsData ''SharedDatum
 
 -- create validator types
-data Shared
-instance Scripts.ValidatorTypes Shared where
-  type instance DatumType Shared = SharedDatum
-  type instance RedeemerType Shared = ()
+data SharedWalletValidator
+instance Scripts.ValidatorTypes SharedWalletValidator where
+  type instance DatumType SharedWalletValidator = SharedDatum
+  type instance RedeemerType SharedWalletValidator = ()
 ```
 
-Next, we need to write the `mkValidator` logic. As before, we need to destructure the transaction context to get `TxInfo`, and use the [`txSignedBy` ](https://playground.plutus.iohkdev.io/doc/haddock/plutus-ledger-api/html/Plutus-V2-Ledger-Contexts.html#v:txSignedBy)function from `Plutus.V2.Ledger.Contexts` to check for the signature. `txSignedBy` accepts two arguments, one of type `TxInfo` and the other `PubKeyHash`, returning `True` if the signature is present:
+Next, we need to write the `mkValidator` logic. As before, we need to destructure the transaction context to get `TxInfo`, and use the [`txSignedBy` ](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V2-Ledger-Contexts.html#v:txSignedBy)function from `Plutus.V2.Ledger.Contexts` to check for the signature. `txSignedBy` accepts two arguments, one of type `TxInfo` and the other `PubKeyHash`, returning `True` if the signature is present:
 
 `txSignedBy :: TxInfo -> Plutus.V1.Ledger.Crypto.PubKeyHash -> Bool`
 
@@ -49,7 +51,7 @@ mkValidator sdat _ ctx = checkSignature1 || checkSignature2
     checkSignature2 = traceIfFalse "signature 2 missing" $ txSignedBy info signature2
 ```
 
-Now we have a function of type `SharedDatum -> () -> Plutus.ScriptContext -> Bool`, but remember that we always have to get down to the Plutus Core version of a validator: `BuiltinData -> BuiltinData -> BuiltinData -> ()`. So with typed validators, we have to do some extra steps to get there. Instead of the simple `Plutus.mkValidatorScript`, we need to use `PSU.V2.mkTypedValidator` (from `import qualified Plutus.Script.Utils.V2.Typed.Scripts as PSU.V2`). The definition of `PSU.V2.mkTypedValidator` is:
+Now we have a function of type `SharedDatum -> () -> Plutus.ScriptContext -> Bool`, but remember that we always have to get down to the Untyped Plutus Core version of a validator: `BuiltinData -> BuiltinData -> BuiltinData -> ()`. So with typed validators, we have to do some extra steps to get there. Instead of the simple `Plutus.mkValidatorScript`, we need to use `PSU.V2.mkTypedValidator` (from `Plutus.Script.Utils.V2.Typed.Scripts`). The type signature of `PSU.V2.mkTypedValidator` is:
 
 ```haskell
 -- | Make a 'TypedValidator' from the 'CompiledCode' of a validator script and its wrapper.
@@ -63,15 +65,14 @@ mkTypedValidator ::
 
 It accepts a compiled code of a typed validator (with some `ValidatorType a`) and a wrapper that is a function of compiled code `ValidatorType a -> WrappedValidatorType`. The `WrappedValidatorType` is simply a synonym for the basic validator function `BuiltinData -> BuiltinData -> BuiltinData -> ()`. That wrapper function for us is simply `PSU.mkUntypedValidator` which has the type signature:
 
-```haskell
-mkUntypedValidator
-    :: forall d r
+<pre class="language-haskell"><code class="lang-haskell"><strong>mkUntypedValidator
+</strong>    :: forall d r
     . (PV1.UnsafeFromData d, PV1.UnsafeFromData r)
     => (d -> r -> sc -> Bool)
     -> UntypedValidator
-```
+</code></pre>
 
-What this means is simply that instead of compiling just the validator function to Plutus core (`$$(PlutusTx.compile [|| mkValidator ||])`) we also need to compile this wrapper. So `PSU.V2.mkTypedValidator` ends up being applied to both of the compiled code instances:
+What this means is simply that instead of compiling just the validator function to Plutus core with `$$(PlutusTx.compile [|| mkValidator ||])`, we also need to compile this wrapper. So `PSU.V2.mkTypedValidator` ends up being applied to both of the compiled code instances:
 
 ```haskell
 typedValidator :: PSU.TypedValidator Shared
@@ -82,7 +83,7 @@ typedValidator = PSU.V2.mkTypedValidator @Shared
         wrap = PSU.mkUntypedValidator
 ```
 
-From there, the rest is the same as before with only a minor difference in getting the actual validator and its hash. The `TypedValidator` type has multiple fields so the following is pretty much just destructuring to get what we want:
+From there, the rest is the same as before with only a minor difference in getting the actual validator and its hash. When compiling untyped validators, we got a type of `Plutus.Validator` as the compilation result. However, with `TypedValidator` we get a type that has multiple fields so we need to destructure it first to get to `Plutus.Script` type that we can use to serialise the script:
 
 ```haskell
 validator :: Plutus.Validator  -- uses tvValidator to get the validator
@@ -90,73 +91,77 @@ validator = PSU.V2.validatorScript typedValidator
 
 script :: Plutus.Script -- gets the hash
 script = Plutus.unValidatorScript validator
-
--- could just use this single function instead on typedValidator:
--- | The hash of the validator.
--- validatorHash :: TypedValidator a -> Scripts.ValidatorHash
--- validatorHash = tvValidatorHash
 ```
 
-Lastly, we just need to adjust the serialise/write file functions to correct names for this module.
+Lastly, we just need to add serialise/write file functions for this module.
 
-That's it for the script. We now need to create the correct datum and learn how to construct valid transactions for this use case. First of all, how do we get a `PubKeyHash` of an address? We can use the `cardano-cli address key-hash` command:
+```haskell
+scriptShortBs :: SBS.ShortByteString
+scriptShortBs = SBS.toShort . LBS.toStrict $ serialise script
+
+scriptSerialised :: PlutusScript PlutusScriptV2
+scriptSerialised = PlutusScriptSerialised scriptShortBs
+
+writeSerialisedScript :: IO (Either (FileError ()) ())
+writeSerialisedScript = writeFileTextEnvelope "compiled/SharedWallet.plutus" Nothing scriptSerialised
+```
+
+### Serialising a custom datum type
+
+That's it for the script. We now need to create the correct datum and learn how to construct valid transactions for this use case. First of all, how can we get a `PubKeyHash` of an address? We can use the `cardano-cli address key-hash` command:
 
 ```bash
 cardano-cli address key-hash \
-    --payment-verification-key-file ../normal_address/01.vkey
-42f6fcc03996f6af623bd761845a4c3470623e5cdfd72fc20dee990b
+    --payment-verification-key-file ../address/01.vkey
+a5d318dadfb52eeffb260ae097f846aea0ca78e6cc4fe406d4ceedc0
 
 cardano-cli address key-hash \
-    --payment-verification-key-file ../normal_address/02.vkey
-1dbbab8486140e253674dd2af159c322c5c48232b1a358670b1ef5a7
+    --payment-verification-key-file ../address/02.vkey
+1b1e5895b03302b248e8c459817bab49471c4013a0806ac52cb73f9b
 ```
 
-That gets us the `PubKeyHash`es. How do we write them to a valid datum file? We can create and import the `SharedDatum` type (we have to export it first) from the `TypedValidator.hs` module and create an instance of it, then serialise and write it to a file. With our helper functions from before we can create a new module `WriteSharedDatum.hs`:
+That gets us the `PubKeyHash`es. How can we write them to a valid datum file in JSON format? We can create and import the `SharedDatum` type (we have to export it first) from the `TypedValidator.hs` module and create an instance of it, then serialise and write it to a file. We already have our `Utils` module to write Plutus data to JSON so we can use that. We just need to use some REPL wizardry to do it right. First off, we want to export the `SharedDatum` data type from our `SharedWallet.hs` in order to be able to import it somewhere else. We use the `SharedDatum (..)` syntax to export the type constructor and not just the type.&#x20;
 
 ```haskell
-{-# LANGUAGE DataKinds         #-} -- make any type constructor into a type
-{-# LANGUAGE NoImplicitPrelude #-} -- don't import Prelude by default
-{-# LANGUAGE OverloadedStrings #-} -- allows embedding domain specific language into the Haskell host language
-
-module WriteSharedDatum
-
+module SharedWallet
+  (
+    scriptSerialised,
+    writeSerialisedScript,
+    SharedDatum (..)
+  )
 where
-
-import qualified PlutusTx
-import PlutusTx.Prelude
-import Data.Aeson (encode)
-import TypedValidator (SharedDatum (..))
-import Ledger (PubKeyHash (..), PaymentPubKeyHash (..))
-
-import Cardano.Api.Shelley (fromPlutusData, scriptDataToJson, ScriptDataJsonSchema (ScriptDataJsonDetailedSchema))
-
-import qualified Data.ByteString.Lazy as LBS
-
-import Prelude (IO, String)
-
-myDatum1 = SharedDatum {
-  wallet1="42f6fcc03996f6af623bd761845a4c3470623e5cdfd72fc20dee990b" :: PubKeyHash,
-  wallet2="1dbbab8486140e253674dd2af159c322c5c48232b1a358670b1ef5a7" :: PubKeyHash
-}
-
-plutusDataToJSON :: PlutusTx.ToData a => a ->  LBS.ByteString
-plutusDataToJSON = encode . scriptDataToJson ScriptDataJsonDetailedSchema . fromPlutusData . PlutusTx.toData
-
-writeJSONData :: PlutusTx.ToData a => String -> IO ()
-writeJSONData filePath = LBS.writeFile filePath $ plutusDataToJSON myDatum1
 ```
 
-Load the module in the `cabal repl` and execute the function:
+Next, update the `exposed-modules` in the `.cabal` file of the project for `SharedWallet`:
 
-`ghci> writeJSONData compiled/assets/sharedDatum.json`
-
-We end up with the following in `compiled/assets/sharedDatum.json`:
-
+```haskell
+...
+    exposed-modules:      SimplestSuccess
+                        , GuessingGame
+                        , ExploringScriptContext
+                        , SharedWallet -- add SharedWallet here
+                        , Helpers.Utils
+...
 ```
-{"constructor":0,"fields":[{"bytes":"42f6fcc03996f6af623bd761845a4c3470623e5cdfd72fc20dee990b"},{"bytes":"1dbbab8486140e253674dd2af159c322c5c48232b1a358670b1ef5a7"}]}
+
+&#x20;We are now ready to load up our `cabal repl` and start importing:
+
+<pre class="language-haskell"><code class="lang-haskell">Prelude SimplestSuccess> import SharedWallet 
+Prelude SharedWallet SimplestSuccess> import Helpers.Utils 
+Prelude SharedWallet Helpers.Utils SimplestSuccess> :set -XOverloadedStrings
+<strong>Prelude SharedWallet Helpers.Utils SimplestSuccess> myDatum = SharedDatum "a5d318dadfb52eeffb260ae097f846aea0ca78e6cc4fe406d4ceedc0" "1b1e5895b03302b248e8c459817bab49471c4013a0806ac52cb73f9b"
+</strong>Prelude SharedWallet Helpers.Utils SimplestSuccess> writeJSONData "compiled/assets/SharedDatum.json"
+</code></pre>
+
+We used `:set -XOverloadedStrings` to enable the overloaded strings extension inside the REPL in order for it to be able to interpret our strings as `PubKeyHash`es, which is the type our datum requires. We end up with the following in `compiled/assets/SharedDatum.json`:
+
+```json
+{"constructor":0,"fields":[{"bytes":"a5d318dadfb52eeffb260ae097f846aea0ca78e6cc4fe406d4ceedc0"},{"bytes":"1b1e5895b03302b248e8c459817bab49471c4013a0806ac52cb73f9b"}]}
 ```
 
-As before we have the helper scripts for testing:
+We now have everything we need to start testing the validator on the testnet.
+
+### Testing the validator
 
 1\) `create-script-address.sh`
 

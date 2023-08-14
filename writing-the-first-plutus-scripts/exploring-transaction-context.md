@@ -66,7 +66,7 @@ Now that we have a theoretical overview of the script context, let's write a sim
 
 Cardano transactions contain a  `txInfoValidRange`, which defines the range of _slots_ between which the transaction is valid. There are two layers of checking the valid range for a transaction. The first one happens when a `cardano-node` receives the transaction. The first thing the node does when considering a transaction is check its valid range - if the current slot does not fall into the valid range of the transaction, it is immediately discarded without doing anything else (including running a possible validator script in the transaction). The second layer is optional and can be specified in the validator script itself. This is done by accessing the `txInfoValidRange` from the `ScriptContext` and performing arbitrary checks against it.
 
-#### Writing the validator
+### Writing the validator
 
 Create a new file `src/ExploringScriptContext.hs` for this validator. Our imports stay the same as in the previous scripts so copy those in. Firstly, we need to change the way we look at arguments in the `mkValidator` function. We are not interested in the `datum` and `redeemer` fields so we can ignore them now, and instead, look only at the `context` field:
 
