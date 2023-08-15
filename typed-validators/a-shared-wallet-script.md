@@ -220,7 +220,7 @@ We now have everything we need to start testing the validator on the testnet.
 
 ### Testing the validator
 
-1\) `create-script-address.sh`
+Let's create a script address for this validator in `create-script-address.sh`.
 
 ```bash
 #!/usr/bin/env bash
@@ -229,14 +229,14 @@ NWMAGIC=2 # preview testnet
 
 # Build script address
 cardano-cli address build \
---payment-script-file TypedValidator.plutus \
+--payment-script-file ../../compiled/SharedWallet.plutus \
 --testnet-magic $NWMAGIC \
---out-file TypedValidator.addr
+--out-file SharedWallet.addr
 
-echo "Script address: $(cat TypedValidator.addr)"
+echo "Script address: $(cat SharedWallet.addr)"
 ```
 
-2\) `check-utxos.sh`
+We need to update the `check-utxos.sh` for this validator as well.
 
 ```bash
 #!/usr/bin/env bash
@@ -244,31 +244,42 @@ echo "Script address: $(cat TypedValidator.addr)"
 NWMAGIC=2 # preview testnet
 export CARDANO_NODE_SOCKET_PATH=$CNODE_HOME/sockets/node0.socket
 
-funds_normal1=$(cardano-cli query utxo \
---address $(cat ../normal_address/01.addr) \
---testnet-magic $NWMAGIC)
-
-funds_normal2=$(cardano-cli query utxo \
---address $(cat ../normal_address/02.addr) \
+funds_normal=$(cardano-cli query utxo \
+--address $(cat ../address/01.addr) \
 --testnet-magic $NWMAGIC)
 
 funds_script=$(cardano-cli query utxo \
---address $(cat TypedValidator.addr) \
+--address $(cat SharedWallet.addr) \
 --testnet-magic $NWMAGIC)
 
-echo "Normal address1:"
-echo "${funds_normal1}"
-echo ""
-
-echo "Normal address2:"
-echo "${funds_normal2}"
-echo ""
+echo "Normal address:"
+echo "${funds_normal}"
 
 echo "Script address:"
 echo "${funds_script}"
 ```
 
-3\) `send-funds-to-script.sh`
+After running these two scripts, we see the UTxO status. The script address does not have any UTxOs on it.
+
+```bash
+./create-script-address.sh 
+Script address: addr_test1wqtul3uvnfqvk7a52fa7r5wcrn6alna6t6pd684jj8mmdvgdxn9r9
+
+./check-utxos.sh 
+Normal address:
+                           TxHash                                 TxIx        Amount
+--------------------------------------------------------------------------------------
+5dc5111e257f8e68b0978c9619e57bbb12d365c0ec45d879115866bb674156ae     0        1826915 lovelace + TxOutDatumNone
+e4a68d9cb4e58d47085c74426441445eaa30c2a60a9d102217d27ec0b0664db8     1        9985492189 lovelace + TxOutDatumNone
+ede24e9e40ca82830c75d827b5c3b090132c1afaebd3a4256655fb5d2382474a     0        9649776 lovelace + TxOutDatumNone
+ee346be463426509daec07aba24a8905c5f55965daebb39f842a49191d83f9e1     0        1829006 lovelace + TxOutDatumNone
+
+Script address:
+                           TxHash                                 TxIx        Amount
+--------------------------------------------------------------------------------------
+```
+
+We need to supply the script with some funds in order to test that we can spend it with a valid signature. We already serialised our datum that specifies the two public key hashes that are allowed to spend the funds associated with the UTxO. Let's create a `send-funds-to-script.sh` that will do that for us by sending 20 tADA to the script along with the datum.
 
 ```bash
 #!/usr/bin/env bash
@@ -278,16 +289,15 @@ export CARDANO_NODE_SOCKET_PATH=$CNODE_HOME/sockets/node0.socket
 
 cardano-cli transaction build \
     --testnet-magic $NWMAGIC \
-    --change-address $(cat ../normal_address/01.addr) \
-    --tx-in 41393cb43ed78ebda383530b1feb13b41b0d4d9ff52510fbf09d3f056863c2ab#1 \
-    --tx-out $(cat TypedValidator.addr)+20000000 \
-    --tx-out-datum-embed-file ../assets/sharedDatum.json \
-    --protocol-params-file ../normal_address/protocol.json \
+    --change-address $(cat ../address/01.addr) \
+    --tx-in e4a68d9cb4e58d47085c74426441445eaa30c2a60a9d102217d27ec0b0664db8#1 \
+    --tx-out $(cat SharedWallet.addr)+20000000 \
+    --tx-out-datum-embed-file ../../compiled/assets/SharedDatum.json \
     --out-file tx.body
 
 cardano-cli transaction sign \
     --tx-body-file tx.body \
-    --signing-key-file ../normal_address/01.skey \
+    --signing-key-file ../address/01.skey \
     --testnet-magic $NWMAGIC \
     --out-file tx.signed
 
@@ -296,7 +306,16 @@ cardano-cli transaction submit \
     --tx-file tx.signed
 ```
 
-4\) `spend-script-utxo.sh`
+Checking the UTxOs on the script shows us the new output with the hash of our datum:
+
+```bash
+Script address:
+                           TxHash                                 TxIx        Amount
+--------------------------------------------------------------------------------------
+b980f55aade4508803dcac1c48c28554ee9cf942e40ac1cb5e40e48a621263a5     0        20000000 lovelace + TxOutDatumHash ScriptDataInBabbageEra "7857b572c6e6f6fdacffef2bdec1ecc87e32b805c11c75abd59ad9d18e7f438f"
+```
+
+We now want to spend this UTxO. Let's try it first without signing the transaction with anything. Create a `spend-script-funds-no-signature.sh`.
 
 ```bash
 #!/usr/bin/env bash
@@ -307,20 +326,88 @@ export CARDANO_NODE_SOCKET_PATH=$CNODE_HOME/sockets/node0.socket
 
 cardano-cli transaction build \
     --testnet-magic $NWMAGIC \
-    --change-address $(cat ../normal_address/02.addr) \
-    --tx-in 892ff638586f24f2413bab71ff49acdef62af2e8d72ad223b67e11d2607e33d6#0 \
-    --tx-in-script-file TypedValidator.plutus \
-    --tx-in-datum-file ../assets/sharedDatum.json \
-    --tx-in-redeemer-file ../assets/unit.json \
-    --tx-in-collateral 45337a0fb353dadc7e31f865378885207553b4471814384421e0fa1607271bf6#1 \
-    --required-signer-hash 1dbbab8486140e253674dd2af159c322c5c48232b1a358670b1ef5a7 \
-    --protocol-params-file ../normal_address/protocol.json \
+    --change-address $(cat ../address/02.addr) \
+    --tx-in b980f55aade4508803dcac1c48c28554ee9cf942e40ac1cb5e40e48a621263a5#0 \
+    --tx-in-script-file ../../compiled/SharedWallet.plutus \
+    --tx-in-datum-file ../../compiled/assets/SharedDatum.json \
+    --tx-in-redeemer-file ../../compiled/assets/unit.json \
+    --tx-in-collateral ee346be463426509daec07aba24a8905c5f55965daebb39f842a49191d83f9e1#0 \
+    --out-file tx.body
+
+cardano-cli transaction submit \
+    --testnet-magic $NWMAGIC \
+    --tx-file tx.signed
+```
+
+Running this will give us an error:
+
+```bash
+./spend-script-funds-no-signature.sh 
+Command failed: transaction build  Error: The following scripts have execution failures:
+...
+Script debugging logs: signature 1 missing
+signature 2 missing
+```
+
+We see that the `transaction build` command failed before we even get to the point where we sign the transaction with `cardano-cli transaction sign`. This is because the `transaction build` command must already run the validator in question to determine whether the transaction is valid. As our validator checks the transaction signatures with `txSignedBy`, it will certainly fail validation since the transaction is not signed by anything at this build stage. So we need a way to tell the transaction-building command that the transaction _needs to be signed_ by some private key corresponding to a public key hash.
+
+This is where the `--required-signer-hash` option comes in.
+
+```bash
+cardano-cli transaction build --help
+...
+--required-signer-hash HASH
+                           Hash of the verification key (zero or more) whose
+                           signature is required.
+...
+```
+
+The `--required-signer-hash` will run the validator simulation _as if the transaction was signed with the private key matching the specified public key hash_. Besides creating the correct simulation for the validator, this option will also make the transaction invalid for submitting _unless_ it really is signed by the correct key. We can check this ourselves by specifying the `--required-signer-hash` to pass validator simulation, but then try submitting the transaction without a signature. Let's update the `cardano-cli transaction build` command in our `spend-script-funds-no-signature.sh`  to include the `--required-signer-hash` option.
+
+```bash
+cardano-cli transaction build \
+    --testnet-magic $NWMAGIC \
+    --change-address $(cat ../address/02.addr) \
+    --tx-in b980f55aade4508803dcac1c48c28554ee9cf942e40ac1cb5e40e48a621263a5#0 \
+    --tx-in-script-file ../../compiled/SharedWallet.plutus \
+    --tx-in-datum-file ../../compiled/assets/SharedDatum.json \
+    --tx-in-redeemer-file ../../compiled/assets/unit.json \
+    --tx-in-collateral ee346be463426509daec07aba24a8905c5f55965daebb39f842a49191d83f9e1#0 \
+    --required-signer-hash a5d318dadfb52eeffb260ae097f846aea0ca78e6cc4fe406d4ceedc0 \
+    --out-file tx.body
+```
+
+We will get through the validator run this time, but the transaction will still fail to be submitted as expected.
+
+```bash
+./spend-script-funds-no-signature.sh 
+Estimated transaction fee: Lovelace 317891
+Command failed: transaction submit  Error: Error while submitting tx: ShelleyTxValidationError ShelleyBasedEraBabbage (ApplyTxError [UtxowFailure (UtxoFailure (AlonzoInBabbageUtxoPredFailure (ValueNotConservedUTxO (MaryValue 0 (MultiAsset (fromList []))) (MaryValue 9985492189 (MultiAsset (fromList [])))))),UtxowFailure (UtxoFailure (AlonzoInBabbageUtxoPredFailure (BadInputsUTxO (fromList [TxIn (TxId {unTxId = SafeHash "e4a68d9cb4e58d47085c74426441445eaa30c2a60a9d102217d27ec0b0664db8"}) (TxIx 1)]))))])
+```
+
+That's enough testing invalid transactions for this validator. Finally, let's create a valid transaction that will spend the funds by signing the transaction with our `02.skey` (even though the funds were sent from `01.addr`). Create a `spend-script-funds.sh` script with an updated `--required-signer-hash`, and sign and submit the transaction. The change address will be `02.addr`.
+
+```bash
+#!/usr/bin/env bash
+
+NWMAGIC=2 # preview testnet
+export CARDANO_NODE_SOCKET_PATH=$CNODE_HOME/sockets/node0.socket
+
+
+cardano-cli transaction build \
+    --testnet-magic $NWMAGIC \
+    --change-address $(cat ../address/02.addr) \
+    --tx-in b980f55aade4508803dcac1c48c28554ee9cf942e40ac1cb5e40e48a621263a5#0 \
+    --tx-in-script-file ../../compiled/SharedWallet.plutus \
+    --tx-in-datum-file ../../compiled/assets/SharedDatum.json \
+    --tx-in-redeemer-file ../../compiled/assets/unit.json \
+    --tx-in-collateral ee346be463426509daec07aba24a8905c5f55965daebb39f842a49191d83f9e1#0 \
+    --required-signer-hash 1b1e5895b03302b248e8c459817bab49471c4013a0806ac52cb73f9b \
     --out-file tx.body
 
 cardano-cli transaction sign \
     --tx-body-file tx.body \
-    --signing-key-file ../normal_address/02.skey \
-    --signing-key-file ../normal_address/01.skey \
+    --signing-key-file ../address/02.skey \
     --testnet-magic $NWMAGIC \
     --out-file tx.signed
 
@@ -329,4 +416,46 @@ cardano-cli transaction submit \
     --tx-file tx.signed
 ```
 
-One important note is that in `spend-script-utxo.sh`, the transaction building command has to use the `--required-signer-hash` specifying one or the other key hashes on the datum of the UTxO we are spending. This is because the `build` command already has to run its validation for the script input, and unless we provide it with the required signer parameter, it cannot correctly check `txSignedBy` logic, as the transaction is not signed by any signature at this stage. It is a way of saying "evaluate this script under the assumption that the transaction _**WILL**_ be signed by this public key hash!".
+Interestingly, the transaction still fails at the submit stage. But notice that the transaction did successfully pass the validator simulation before failing.
+
+```bash
+./spend-script-funds.sh 
+Estimated transaction fee: Lovelace 317891
+Command failed: transaction submit  Error: Error while submitting tx: ShelleyTxValidationError ShelleyBasedEraBabbage (ApplyTxError [UtxowFailure (AlonzoInBabbageUtxowPredFailure (ShelleyInAlonzoUtxowPredFailure (MissingVKeyWitnessesUTXOW (fromList [KeyHash "a5d318dadfb52eeffb260ae097f846aea0ca78e6cc4fe406d4ceedc0"]))))])
+```
+
+It says we have a `MissingVKeyWitnessesUTXOW` corresponding to `a5d318dadfb52eeffb260ae097f846aea0ca78e6cc4fe406d4ceedc0`. But that is our `01.addr` public key hash! Why is it complaining about it? Well, remember what we said about collateral inputs, they must always be present with script transactions to cover potential failures. Our collateral input for this transaction is still `ee346be463426509daec07aba24a8905c5f55965daebb39f842a49191d83f9e1#0`, which belongs to `01.addr` so clearly the transaction must be signed by `01.skey` as well in order to allow the usage of this UTxO. Let's add that signature to the `cardano-cli transaction sign` command to allow the transaction to use that collateral input.
+
+```bash
+...
+
+cardano-cli transaction sign \
+    --tx-body-file tx.body \
+    --signing-key-file ../address/01.skey \
+    --signing-key-file ../address/02.skey \
+    --testnet-magic $NWMAGIC \
+    --out-file tx.signed
+
+...
+```
+
+Submitting the transaction again works as expected now.
+
+```bash
+./spend-script-funds.sh 
+Estimated transaction fee: Lovelace 317891
+Transaction successfully submitted.
+```
+
+If we check our `02.addr` UTxOs, we will see the funds we just spent from the script.
+
+```bash
+cardano-cli query utxo \
+--address $(cat ../address/02.addr) \
+--testnet-magic 2 \
+--socket-path $CNODE_HOME/sockets/node0.socket
+
+                           TxHash                                 TxIx        Amount
+--------------------------------------------------------------------------------------
+59590fab00fb430d205151c59ca7e00af38e9945d778abdae6897f368aa39591     0        19682109 lovelace + TxOutDatumNone
+```
