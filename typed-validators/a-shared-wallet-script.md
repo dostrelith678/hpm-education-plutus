@@ -4,7 +4,7 @@ Now, we will write our first typed validator. It will act as a shared wallet bet
 
 ### Writing the validator
 
-We can start off by creating our datum type, `SharedDatum`, and the corresponding `ValidatorTypes`, `Shared`. `SharedDatum` will have two fields, each corresponding to a `PubKeyHash` of one of the parties.
+We can start off by creating our datum type, `SharedDatum`, and the corresponding `ValidatorTypes`, `Shared`. `SharedDatum` will have two fields, each corresponding to a `PubKeyHash` (from the `Plutus.V2.Ledger.Api` module) of one of the parties.
 
 ```haskell
 -- create a new datum type
@@ -95,12 +95,18 @@ It accepts a compiled code of a typed validator (with some `ValidatorType a`) an
 What this means is simply that instead of compiling just the validator function to Plutus core with `$$(PlutusTx.compile [|| mkValidator ||])`, we also need to compile this wrapper. So `PSU.V2.mkTypedValidator` ends up being applied to both of the compiled code instances:
 
 ```haskell
-typedValidator :: PSU.TypedValidator Shared
-typedValidator = PSU.V2.mkTypedValidator @Shared
+typedValidator :: PSU.TypedValidator SharedWalletValidator
+typedValidator = PSU.V2.mkTypedValidator @SharedWalletValidator
     $$(PlutusTx.compile [|| mkValidator ||])
     $$(PlutusTx.compile [|| wrap ||])
     where
         wrap = PSU.mkUntypedValidator
+```
+
+In order for this to work, we also need to enable the `DataKinds` GHC extension.
+
+```haskell
+{-# LANGUAGE DataKinds #-}
 ```
 
 Make sure that the `plutus-script-utils` packages are imported:

@@ -21,7 +21,7 @@ mkValidator :: Plutus.POSIXTime -> () -> () -> Plutus.ScriptContext -> Bool
 Inside the function, we want to check that the `txInfoValidRange` is contained in its entirety in the interval of negative infinity to the deadline.
 
 {% hint style="warning" %}
-Important to note that the _**ENTIRE**_ tx range must fall into this interval because if the positive end of the valid range would go over the deadline, the transaction would be validated after the deadline even if the majority of the valid range is before the deadline!
+Important to note that the _**ENTIRE**_ transaction validity range must fall into this interval because if the positive end of the valid range would go over the deadline, the transaction would be validated after the deadline even if the majority of the valid range is before the deadline!
 {% endhint %}
 
 We will need to use some functions from the [`Interval` module](https://input-output-hk.github.io/plutus/master/plutus-ledger-api/html/PlutusLedgerApi-V1-Interval.html) to determine that, namely `contains` and `to`.&#x20;
