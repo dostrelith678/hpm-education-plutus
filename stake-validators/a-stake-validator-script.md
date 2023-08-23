@@ -1,6 +1,51 @@
 # A Stake Validator Script
 
-In this `StakeValidator` example, we will create a simple script that controls staking actions via secret codes that the script is parameterised with. We will create the `CodeParam` as before:
+In this `StakeValidator` example, we will create a simple script that controls staking actions via secret codes that the script is parameterised with.&#x20;
+
+### Writing the validator
+
+First, we will use the same GHC extensions as with the [parameterised shared wallet script](../parameterised-validators/another-shared-wallet-script.md) and the same module imports (except we don't need `txSignedBy` here).
+
+```haskell
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE DataKinds             #-}
+
+module StakingValidator
+  (
+    scriptSerialised,
+    writeSerialisedScript,
+    CodeParam (..)
+  )
+where
+
+import qualified PlutusTx
+import PlutusTx.Prelude
+import qualified Plutus.V2.Ledger.Api as Plutus
+
+import Cardano.Api.Shelley (PlutusScript (PlutusScriptSerialised), PlutusScriptV2, writeFileTextEnvelope)
+import Cardano.Api (FileError)
+
+import qualified Data.ByteString.Lazy as LBS
+import qualified Data.ByteString.Short as SBS
+import Codec.Serialise
+
+import qualified Ledger.Typed.Scripts as Scripts
+import qualified Plutus.Script.Utils.V2.Typed.Scripts as PSU.V2
+import qualified Plutus.Script.Utils.Typed as PSU
+
+import Prelude (IO)
+
+...
+
+```
+
+Then, we need to create a parameter for the script as before, calling it `CodeParam`, and making it an instance of `Data` and `Lift` classes.
 
 ```haskell
 data CodeParam = CodeParam {
@@ -23,15 +68,17 @@ instance PSU.ValidatorTypes CodeValidator where
 We now have everything to create the `mkStakingValidator` function which will represent our stake validator logic:
 
 ```haskell
-mkStakingValidator :: CodeParam -> Integer -> ScriptContext -> Bool
+mkStakingValidator :: CodeParam -> Integer -> Plutus.ScriptContext -> Bool
 mkStakingValidator cp redeemer ctx = 
-  case scriptContextPurpose ctx of
-    Certifying _   -> redeemer == cert cp
-    Rewarding  _   -> redeemer == reward cp
-    _              -> False
+  case Plutus.scriptContextPurpose ctx of
+    Plutus.Certifying _   -> redeemer == cert cp
+    Plutus.Rewarding  _   -> redeemer == reward cp
+    _                     -> False
 ```
 
-We simply need to check that the `redeemer` matches the corresponding action. Any script purpose other than `Certifying` or `Rewarding` will always be `False`. Next, we need to compile that function into a `StakeValidator`. Since there is still no interface for `TypedStakeValidator`, we have to use somewhat explicit code with `mkStakeValidatorScript` and `mkUntypedStakeValidator`. This function is defined as:
+We simply need to check that the `redeemer` matches the corresponding action. Any script purpose other than `Certifying` or `Rewarding` will always be `False`.
+
+Next, we need to compile that function into a `StakeValidator` type with the end goal of the `UntypedStakeValidator` that we looked at earlier. Since there is still no interface `TypedStakeValidator`, we have to use somewhat explicit code with `mkStakeValidatorScript` and [`mkUntypedStakeValidator`](https://input-output-hk.github.io/plutus-apps/main/plutus-script-utils/html/Plutus-Script-Utils-Typed.html#v:mkUntypedStakeValidator). This function is defined as:
 
 ```haskell
 mkUntypedStakeValidator
@@ -39,38 +86,51 @@ mkUntypedStakeValidator
     => (r -> sc -> Bool)
     -> UntypedStakeValidator
 mkUntypedStakeValidator f r p =
-    check $ f (PV1.unsafeFromBuiltinData r) (PV1.unsafeFromBuiltinData p)
+    check $ f (tracedUnsafeFrom "Redeemer decoded successfully" r)
+              (tracedUnsafeFrom "Script context decoded successfully" p)
 ```
 
-It receives a function `(r -> sc -> Bool)` and returns the `UntypedStakeValidator` which is the end result we want here. Since this is a parameterised contract, we have to apply our `CodeParam` to the `mkStakingValidator` function first in order to get just the `(Integer -> ScriptContext -> Bool)` function that is required. That is why we have to compose the two functions together and _apply_ the `CodeParam`. However, since this is all being compiled to Plutus IR (intermediate Plutus Core), we also have to first _lift_ the `CodeParam` value to Plutus IR for it to be applied.
+It receives a function `(r -> sc -> Bool)` and returns the `UntypedStakeValidator` which is the end result we want here. Since this is a parameterised contract, we have to apply our `CodeParam` to the `mkStakingValidator` function first in order to get just the `(Integer -> ScriptContext -> Bool)` function that is required here.
 
-We do this with `PlutusTx.liftCode cp`, and we are able to do it because we made `CodeParam` an instance of the `Lift` class! In the previous examples, this was abstracted for us via the `mkTypedValidator` function, but since one is not available for stake validators (yet), we have to do it manually here:
+That is why we have to compose the two functions together and _apply_ the `CodeParam`. However, since this is all being compiled to Plutus IR (intermediate Plutus Core), we also have to first _lift_ the `CodeParam` value to Plutus IR for it to be applied.
+
+We do this with `PlutusTx.liftCode cp`, and we are able to do it because we made `CodeParam` an instance of the `Lift` class. In the previous examples, this was abstracted for us via the `mkTypedValidatorParam` function, but since one is not available for stake validators (yet), we have to do it manually here:
 
 ```haskell
-validator :: CodeParam -> V2.StakeValidator
-validator cp = V2.mkStakeValidatorScript $
-  $$(PlutusTx.compile [|| mkUntypedStakeValidator . mkStakingValidator ||])
+validator :: CodeParam -> PSU.V2.StakeValidator
+validator cp = Plutus.mkStakeValidatorScript $
+  $$(PlutusTx.compile [|| PSU.mkUntypedStakeValidator . mkStakingValidator ||])
   `PlutusTx.applyCode`
   PlutusTx.liftCode cp
 ```
 
-The rest is the same as before, the only difference being the function names, and instead of `unValidatorScript`, we use `unStakeValidatorScript` to get the `Script` type of the validator:
+The rest is the same as before, the only difference being that instead of `unValidatorScript`, we use `unStakeValidatorScript` to get the `Script` type of the validator:
 
 ```haskell
-script :: CodeParam -> V2.Script
-script = V2.unStakeValidatorScript . validator
+script :: CodeParam -> Plutus.Script
+script = Plutus.unStakeValidatorScript . validator
 
-codeParamShortBs :: CodeParam -> SBS.ShortByteString
-codeParamShortBs cp = SBS.toShort . LBS.toStrict $ serialise $ script cp
+scripShortBs :: CodeParam -> SBS.ShortByteString
+scripShortBs cp = SBS.toShort . LBS.toStrict $ serialise $ script cp
 
-codeParamScriptSerialised :: CodeParam -> PlutusScript PlutusScriptV2
-codeParamScriptSerialised cp = PlutusScriptSerialised $ codeParamShortBs cp
+scriptSerialised :: CodeParam -> PlutusScript PlutusScriptV2
+scriptSerialised cp = PlutusScriptSerialised $ scripShortBs cp
 
-writeSerialisedCodeParamScript :: CodeParam -> IO (Either (FileError ()) ())
-writeSerialisedCodeParamScript cp = writeFileTextEnvelope "compiled/codeParam.plutus" Nothing $ codeParamScriptSerialised cp
+writeSerialisedScript :: CodeParam -> IO (Either (FileError ()) ())
+writeSerialisedScript cp = writeFileTextEnvelope "compiled/StakingValidator.plutus" Nothing $ scriptSerialised cp
 ```
 
-#### Helper scripts
+All that is left to do is come up with a concrete instance of the `CodeParam` and pass it to the `writeSerialisedScript` function to compile the validator. For this example, we will just use the integers `1` and `2` as our secret codes. In the `cabal repl` of our `nix-shell`, we can do that with:&#x20;
+
+<pre class="language-bash"><code class="lang-bash"><strong>Prelude> :l src/StakingValidator.hs  
+</strong>[1 of 1] Compiling StakingValidator ( src/StakingValidator.hs, /home/plutus/hpm-plutus/hpm-validators/dist-newstyle/build/x86_64-linux/ghc-8.10.7/hpm-validators-0.1.0.0/build/StakingValidator.o )
+Ok, one module loaded.
+Prelude StakingValidator> myCodeParam = CodeParam 1 2
+Prelude StakingValidator> writeSerialisedScript myCodeParam 
+Right ()
+</code></pre>
+
+### Testing the validator
 
 1\) `create-script-address.sh`
 

@@ -76,7 +76,9 @@ But what are the types of `Datum`, `Redeemer` and `Context`? It turns out that i
 
 We see that the `Data` type comes with several constructors, but the main takeaway is that it is a generic data type that can represent various things such as integers, byte strings, lists, and maps. Plutus also features a `BuiltinData` type ([https://input-output-hk.github.io/plutus/master/plutus-tx/html/PlutusTx-Builtins.html#g:4](https://input-output-hk.github.io/plutus/master/plutus-tx/html/PlutusTx-Builtins.html#g:4)) that can be used directly in the on-chain code.
 
-So we can now write the type signature of our validator function using the `BuiltinData` type for its arguments and returning `()`: `mkValidator :: BuiltinData -> BuiltinData -> BuiltinData -> ()`
+So we can now write the type signature of our validator function using the `BuiltinData` type for its arguments and returning `()`:&#x20;
+
+`mkValidator :: BuiltinData -> BuiltinData -> BuiltinData -> ()`
 
 ```
 {-# INLINABLE mkValidator #-}

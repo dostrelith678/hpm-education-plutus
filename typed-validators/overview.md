@@ -41,7 +41,7 @@ typedValidator = PSU.V2.mkTypedValidator @ArbitraryValidatorTypeName
 
 ### Creating Custom Data Types
 
-If we want to create custom data types for our datum or redeemer, we must also create them as instances of the aforementioned `ToData` typeclass. We should simply use the `PlutusTx.unstableMakeIsData` on our defined datum/redeemer type. The difference between `unstableMakeIsData` and `makeIsDataIndexed` is that the latter ensures consistent indexing that is required to be specified and it is **recommended to use `makeIsDataIndexed` in production** because it ensures the same data structure results across different Plutus versions.
+If we want to create custom data types for our datum or redeemer, we must also create them as instances of the aforementioned `ToData` typeclass. We should simply use the [`PlutusTx.unstableMakeIsData`](https://input-output-hk.github.io/plutus-apps/main/plutus-tx/html/PlutusTx.html#v:unstableMakeIsData) on our defined datum/redeemer type. The difference between `unstableMakeIsData` and `makeIsDataIndexed` is that the latter ensures consistent indexing that is required to be specified and it is **recommended to use `makeIsDataIndexed` in production** because it ensures the same data structure results across different Plutus versions.
 
 ```haskell
 data ExampleDatum = ExampleDatumConstr {
