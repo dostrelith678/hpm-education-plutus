@@ -1,51 +1,22 @@
 # References
 
-[https://ci.zw3rk.com/build/959564/download/1/plutus.pdf](https://ci.zw3rk.com/build/959564/download/1/plutus.pdf)
+### General documentation
 
-\
-[https://ci.zw3rk.com/build/1027605/download/1/plutus-core-specification.pdf](https://ci.zw3rk.com/build/1027605/download/1/plutus-core-specification.pdf)
+[Plutus Technical Report](https://ci.iog.io/job/input-output-hk-plutus/master/x86\_64-linux.packages.plutus-report/latest/download/1)\
+[Plutus Code Specification](https://ci.iog.io/job/input-output-hk-plutus/master/x86\_64-linux.packages.plutus-core-spec/latest/download/1)\
+[The Extended UTxO Model](https://ci.iog.io/job/input-output-hk-plutus/master/x86\_64-linux.packages.extended-utxo-spec/latest/download/1)\
+[EUTxO Model Handbook](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdf)\
+[Plutus Haskell style guide](https://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adoc)\
+[Cardano Docs - Plutus](https://docs.cardano.org/plutus/learn-about-plutus/)
 
+### Repositories
 
+[plutus](https://github.com/input-output-hk/plutus) - [docs](https://plutus.readthedocs.io/)\
+[plutus-apps](https://github.com/input-output-hk/plutus-apps) - [docs](https://plutus-apps.readthedocs.io/en/latest/)\
+[plutus-scripts](https://github.com/james-iohk/plutus-scripts)[](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdfhttps://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adochttps://github.com/input-output-hk/plutushttps://plutus.readthedocs.io/https://github.com/input-output-hk/plutus-appshttps://plutus-apps.readthedocs.iohttps://docs.cardano.org/plutus/https://iohk.io/en/research/library/papers/the-extended-utxo-model/https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/https://www.youtube.com/watch?v=usMPt8KpBeI)
 
+### Research papers
 
-
-
-
-
-
-
-
-[https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdf](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdf)
-
-[https://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adoc](https://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adoc)[](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdfhttps://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adochttps://github.com/input-output-hk/plutushttps://plutus.readthedocs.io/https://github.com/input-output-hk/plutus-appshttps://plutus-apps.readthedocs.iohttps://docs.cardano.org/plutus/https://iohk.io/en/research/library/papers/the-extended-utxo-model/https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/https://www.youtube.com/watch?v=usMPt8KpBeI)
-
-[https://github.com/input-output-hk/plutus](https://github.com/input-output-hk/plutus)
-
-[](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdfhttps://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adochttps://github.com/input-output-hk/plutushttps://plutus.readthedocs.io/https://github.com/input-output-hk/plutus-appshttps://plutus-apps.readthedocs.iohttps://docs.cardano.org/plutus/https://iohk.io/en/research/library/papers/the-extended-utxo-model/https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/https://www.youtube.com/watch?v=usMPt8KpBeI)
-
-[https://plutus.readthedocs.io/](https://plutus.readthedocs.io/)
-
-
-
-[https://github.com/input-output-hk/plutus-apps](https://github.com/input-output-hk/plutus-apps)
-
-[](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdfhttps://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adochttps://github.com/input-output-hk/plutushttps://plutus.readthedocs.io/https://github.com/input-output-hk/plutus-appshttps://plutus-apps.readthedocs.iohttps://docs.cardano.org/plutus/https://iohk.io/en/research/library/papers/the-extended-utxo-model/https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/https://www.youtube.com/watch?v=usMPt8KpBeI)
-
-[https://plutus-apps.readthedocs.io/en/latest/](https://plutus-apps.readthedocs.io/en/latest/)
-
-[](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdfhttps://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adochttps://github.com/input-output-hk/plutushttps://plutus.readthedocs.io/https://github.com/input-output-hk/plutus-appshttps://plutus-apps.readthedocs.iohttps://docs.cardano.org/plutus/https://iohk.io/en/research/library/papers/the-extended-utxo-model/https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/https://www.youtube.com/watch?v=usMPt8KpBeI)
-
-[https://docs.cardano.org/plutus/](https://docs.cardano.org/plutus/)
-
-[\
-](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdfhttps://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adochttps://github.com/input-output-hk/plutushttps://plutus.readthedocs.io/https://github.com/input-output-hk/plutus-appshttps://plutus-apps.readthedocs.iohttps://docs.cardano.org/plutus/https://iohk.io/en/research/library/papers/the-extended-utxo-model/https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/https://www.youtube.com/watch?v=usMPt8KpBeI)[https://iohk.io/en/research/library/papers/the-extended-utxo-model/](https://iohk.io/en/research/library/papers/the-extended-utxo-model/)
-
-[\
-](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdfhttps://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adochttps://github.com/input-output-hk/plutushttps://plutus.readthedocs.io/https://github.com/input-output-hk/plutus-appshttps://plutus-apps.readthedocs.iohttps://docs.cardano.org/plutus/https://iohk.io/en/research/library/papers/the-extended-utxo-model/https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/https://www.youtube.com/watch?v=usMPt8KpBeI)[https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/](https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/)
-
-[\
-](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdfhttps://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adochttps://github.com/input-output-hk/plutushttps://plutus.readthedocs.io/https://github.com/input-output-hk/plutus-appshttps://plutus-apps.readthedocs.iohttps://docs.cardano.org/plutus/https://iohk.io/en/research/library/papers/the-extended-utxo-model/https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/https://www.youtube.com/watch?v=usMPt8KpBeI)[https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/](https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/)
-
-[\
-\
-](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdfhttps://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adochttps://github.com/input-output-hk/plutushttps://plutus.readthedocs.io/https://github.com/input-output-hk/plutus-appshttps://plutus-apps.readthedocs.iohttps://docs.cardano.org/plutus/https://iohk.io/en/research/library/papers/the-extended-utxo-model/https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/https://www.youtube.com/watch?v=usMPt8KpBeI)
+[The Extended UTxO model](https://iohk.io/en/research/library/papers/the-extended-utxo-model/)[\
+](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdfhttps://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adochttps://github.com/input-output-hk/plutushttps://plutus.readthedocs.io/https://github.com/input-output-hk/plutus-appshttps://plutus-apps.readthedocs.iohttps://docs.cardano.org/plutus/https://iohk.io/en/research/library/papers/the-extended-utxo-model/https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/https://www.youtube.com/watch?v=usMPt8KpBeI)[Native Custom Tokens in the Extended UTxO Model](https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/)\
+[UTxOma: UTxO with Multi-Asset Support](https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/)[](https://ucarecdn.com/3da33f2f-73ac-4c9b-844b-f215dcce0628/EUTXOhandbook\_for\_EC.pdfhttps://github.com/input-output-hk/plutus/blob/master/STYLEGUIDE.adochttps://github.com/input-output-hk/plutushttps://plutus.readthedocs.io/https://github.com/input-output-hk/plutus-appshttps://plutus-apps.readthedocs.iohttps://docs.cardano.org/plutus/https://iohk.io/en/research/library/papers/the-extended-utxo-model/https://iohk.io/en/research/library/papers/native-custom-tokens-in-the-extended-utxo-model/https://iohk.io/en/research/library/papers/utxomautxo-with-multi-asset-support/https://www.youtube.com/watch?v=usMPt8KpBeI)
