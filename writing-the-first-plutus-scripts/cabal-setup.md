@@ -15,7 +15,7 @@ This will create a default cabal project structure for us that looks like this:
 
 ```bash
 ├── app
-│   ├── Main.hs
+│   └── Main.hs
 ├── CHANGELOG.md
 └── hpm-validators.cabal
 ```
@@ -281,3 +281,36 @@ source-repository-package
       libs/small-steps-test
       libs/non-integral
 ```
+
+The project structure that we will create in this course looks like this:
+
+<pre class="language-bash"><code class="lang-bash">.
+├── cabal.project 
+├── CHANGELOG.md
+├── compiled                        # Compiled assets and validators 
+├── dist-newstyle
+├── hpm-validators.cabal
+├── src/                            # 
+│   ├── DeadlineParam.hs
+<strong>│   ├── ExploringScriptContext.hs
+</strong>│   ├── GuessingGame.hs
+│   ├── Helpers
+│   ├── MintingPolicy.hs
+│   ├── SharedWallet.hs
+│   ├── SharedWalletParam.hs
+│   ├── SimplestSuccess.hs
+│   └── StakingValidator.hs
+└── testnet/                        # Scripts and files for testing validators
+    ├── address
+    ├── build-addresses.sh
+    ├── DeadlineParam
+    ├── ExploringScriptContext
+    ├── GuessingGame
+    ├── MintingPolicy
+    ├── protocol.json
+    ├── SharedWallet
+    ├── SharedWalletParam
+    ├── SimplestSuccess
+    └── StakingValidator
+</code></pre>
+

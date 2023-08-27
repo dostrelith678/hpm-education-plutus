@@ -3,7 +3,7 @@
 A cabal project normally consists of two configuration files:
 
 1. `<project_name>.cabal` - defines the metadata about the project
-2. `cabal.project` - defines options which configure the details of the project build
+2. `cabal.project` - defines options that configure the details of the project build
 
 ### \<project\_name>.cabal
 
@@ -25,7 +25,7 @@ License:            Apache-2.0
 License-files:      LICENSE
 ```
 
-After those, we get the definition of the project type. A project can be a `library` or an `executable`. It can also be both of those. The `plutus-scripts` project is a `library` with source code located in the `src` directory and exposes the listed modules:
+After that, we get the definition of the project type. A project can be a `library` or an `executable`. It can also be both of those. The `plutus-scripts` project is a `library` with source code located in the `src` directory and exposes the listed modules:
 
 ```haskell
 ...
@@ -141,4 +141,3 @@ source-repository-package
 
 ...
 ```
-

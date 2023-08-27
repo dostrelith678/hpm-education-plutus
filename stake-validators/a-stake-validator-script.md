@@ -368,3 +368,42 @@ cardano-cli transaction submit \
     --tx-file tx.signed
 ```
 
+Actually, the pool we initially delegated `pool1qxcz3zxnye8g9ejsqslhl0ljevdx895uc80lr89ulf92gcv40ng` to is not producing blocks anymore so we need to redelegate to another pool. We can write a new `redelegate.sh` script for that.
+
+```bash
+#!/usr/bin/env bash
+
+NWMAGIC=2 # preview testnet
+export CARDANO_NODE_SOCKET_PATH=$CNODE_HOME/sockets/node0.socket
+
+cardano-cli stake-address delegation-certificate \
+  --stake-script-file ../../compiled/StakingValidator.plutus \
+  --stake-pool-id pool1x9xkvkrfw6htmnflpad0z2aqsxx50f5mwkyzpylw0tlsk9z5uff \
+  --out-file deleg.cert
+
+cardano-cli transaction build \
+  --testnet-magic $NWMAGIC \
+  --change-address $(cat StakingValidator.addr) \
+  --tx-in fbbf7a532ff30176087966c129f8fe44aa9e3462e4224e4fbfe3e162b1569ded#2 \
+  --tx-in-collateral ee346be463426509daec07aba24a8905c5f55965daebb39f842a49191d83f9e1#0 \
+  --certificate-file deleg.cert \
+  --certificate-script-file ../../compiled/StakingValidator.plutus \
+  --certificate-redeemer-value 1 \
+  --out-file tx.body
+
+cardano-cli transaction sign \
+  --tx-body-file tx.body \
+  --signing-key-file ../address/01.skey \
+  --testnet-magic $NWMAGIC \
+  --out-file tx.signed
+
+cardano-cli transaction submit \
+  --testnet-magic $NWMAGIC \
+  --tx-file tx.signed
+```
+
+```bash
+./redelegate.sh 
+Estimated transaction fee: Lovelace 309296
+Transaction successfully submitted.
+```
