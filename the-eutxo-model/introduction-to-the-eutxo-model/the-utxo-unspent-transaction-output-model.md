@@ -1,6 +1,6 @@
 # The UTxO (Unspent Transaction Output) model
 
-To get started with Plutus and smart contracts on Cardano, it is important to understand the underlying accounting (ledger) model it uses. Before the Mary era, Cardano used Bitcoin's UTxO (Unspent Transaction Output) model.
+To get started with Plutus and smart contracts on Cardano, it is important to understand the underlying accounting (ledger) model it uses. Before the Mary era, Cardano used Bitcoins' UTxO (Unspent Transaction Output) model.
 
 In the UTxO model, transactions **consist of a list of **_**inputs**_ and **a list of **_**outputs**_. Transaction inputs are **existing and unspent transaction outputs** that are being spent by the transaction. Each output is connected to an _**address**_ and can only be spent **once**, i.e. it can only be an input to a transaction once. **Every input in a spending transaction is spent in its entirety** and following that, it is no longer an _unspent_ transaction output and **cannot** be used as an input anymore. Transactions can have a different number of inputs (_n_) and outputs (_m_). For example, a transaction with one input (`n = 1`) could create one hundred outputs (`m = 100`).
 
