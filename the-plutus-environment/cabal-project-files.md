@@ -2,8 +2,8 @@
 
 A cabal project normally consists of two configuration files:
 
-1. `<project_name>.cabal` - defines the metadata about the project
-2. `cabal.project` - defines options that configure the details of the project build
+1. `<project_name>.cabal` - defines the project metadata.
+2. `cabal.project` - defines the build configuration options of the project.
 
 ### \<project\_name>.cabal
 
@@ -60,7 +60,7 @@ The following two options `default-language` and `ghc-options` specify the langu
 
 [_Reference_](https://cabal.readthedocs.io/en/stable/cabal-project.html)
 
-The `cabal.project` file supports a variety of options which configure the details of your build. Perhaps most importantly, it specifies dependencies which are not on Hackage. In `plutu-scripts`, the first definition in the file is for the [Cardano Haskell package repository](https://input-output-hk.github.io/cardano-haskell-packages/) which aims to be the central package repository for Cardano-related packages not found on Hackage.
+The `cabal.project` file supports a variety of options that configure the details of your build. Perhaps most importantly, it specifies dependencies which are not on Hackage. In `plutus-scripts`, the first definition in the file is for the [Cardano Haskell package repository](https://input-output-hk.github.io/cardano-haskell-packages/) which aims to be the central package repository for Cardano-related packages not found on Hackage.
 
 ```haskell
 -- Custom repository for cardano haskell packages
@@ -77,7 +77,7 @@ repository cardano-haskell-packages
     d4a35cd3121aa00d18544bb0ac01c3e1691d618f462c46129271bccf39f7e8ee
 ```
 
-This instructs `cabal` to look for packages in that repository as well. The `packages` field specifies the list of package locations which contain the local packages to be built by this project. The `index-state` field instructs `cabal` to look for packages in repositories (Hackage/CHaP etc.) with the state of those repositories as it was at the given time.
+This instructs `cabal` to look for packages in that repository as well. The `packages` field specifies the list of package locations that contain the local packages to be built by this project. The `index-state` field instructs `cabal` to look for packages in repositories (Hackage/CHaP etc.) with the state of those repositories as it was at the given time.
 
 ```haskell
 ...

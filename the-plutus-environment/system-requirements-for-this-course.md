@@ -2,8 +2,8 @@
 
 To fully follow the course, you will need a running `cardano-node` instance on one of the Cardano testnets (preferably `preview`). The `cardano-node` instance is required to actually interact with and test the scripts you build. The other requirement is having an environment for writing and compiling Plutus scripts. Together, these two roughly add up to the following two minimal system requirements:
 
-* working memory: 8GB RAM
-* disk space: 60-70GB (nix store will take \~50GB for a Plutus development environment)
+* working memory: 8 GB RAM
+* disk space: 40 GB would be the minimum, 60-80 GB recommended
 
 ### Setting up cardano-node
 
