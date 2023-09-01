@@ -30,18 +30,17 @@ First, we will need to add some GHC extensions at the start of the file:
 {-# LANGUAGE TemplateHaskell   #-} -- allows embedding domain-specific language into the Haskell host language
 ```
 
-The `DataKinds` extension is needed for some Template Haskell or the `PlutusTx` compilation will fail. `NoImplicitPrelude` states not to import the Haskell Prelude. We always need to specify this as `PlutusTx` has its own Prelude that we have to use. When writing the validator to a file, we still need to use the `IO` monad from the original Prelude, which we can import explicitly. The  `TemplateHaskell` extension is simply to allow us to write Template Haskell expressions to be able to properly use `PlutusTx.compile` inside our module.
+The `DataKinds` extension is needed for some Template Haskell features or the `PlutusTx` compilation will fail. `NoImplicitPrelude` states not to import the Haskell Prelude. We always need to specify this as `PlutusTx` has its own Prelude that we have to use. When writing the validator to a file, we still need to use the `IO` monad from the original Prelude, which we can import explicitly. The `TemplateHaskell` extension is simply to allow us to write Template Haskell expressions to be able to properly use `PlutusTx.compile` inside our module.
 
 Next, we define our module name (same as the filename):
 
-```haskell
-module SimplestSuccess
-  (
+<pre class="language-haskell"><code class="lang-haskell"><strong>module SimplestSuccess
+</strong>  (
     successScriptSerialised,
     writeSerialisedSuccessScript
   ) 
 where
-```
+</code></pre>
 
 Next, we need to import the packages required for the compilation of our script. Note that these must be defined in our `.cabal` file in order to be imported here. For now, these will be:
 
@@ -50,7 +49,6 @@ import qualified PlutusTx                           -- main on-chain code module
 import qualified PlutusTx.Prelude     as Prelude    -- Prelude replacement for Plutus
 import qualified Plutus.V2.Ledger.Api as Plutus     -- functions for working with scripts on the ledger
 
--- this is not from Plutus but cardano-node https://input-output-hk.github.io/cardano-node/cardano-api/lib/Cardano-Api-Shelley.html
 import Cardano.Api.Shelley (PlutusScript (PlutusScriptSerialised), PlutusScriptV2, writeFileTextEnvelope)
 import Cardano.Api (FileError)
 
@@ -95,39 +93,38 @@ validator :: Plutus.Validator
 validator = Plutus.mkValidatorScript $$(PlutusTx.compile [|| mkValidator ||])
 ```
 
-The unusual syntax above is template Haskell: `$$([|| ||])`. The function `Plutus.mkValidatorScript` requires a Plutus Core argument so the `mkValidator` is first compiled to Plutus Core. In order for this to work, the compiled function `mkValidator` must be made inlinable with `{-# INLINABLE mkValidator #-}` that we did earlier.
+The unusual syntax above is template Haskell: `$$([|| ||])`. The function [`Plutus.mkValidatorScript`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#v:mkValidatorScript) requires a Plutus Core argument so the `mkValidator` is first compiled to Plutus Core. In order for this to work, the compiled function `mkValidator` must be made inlinable with `{-# INLINABLE mkValidator #-}` that we specified earlier.
 
-Part 3 of our three steps is arguably the simplest. We need to unwrap the validator to get the script. This is just a necessary step to conform with the expected types. Since `Plutus.Validator` is a wrapper around `Plutus.Script` which is used as the actual validator in the ledger, we need to unwrap it.
+Part 3 of our three steps is arguably the simplest. We need to unwrap the validator to get the script. This is just a necessary step to conform with the expected types. Since [`Plutus.Validator`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#t:Validator) is a wrapper around [`Plutus.Script`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#t:Script) which is used as the actual validator in the ledger, we need to unwrap it.
 
-```
+```haskell
 script :: Plutus.Script
 script = Plutus.unValidatorScript validator
 ```
 
 We can now serialise the script to a `ShortByteString`:
 
-```
+```haskell
 successScriptShortBs :: SBS.ShortByteString
 successScriptShortBs = SBS.toShort Prelude.. LBS.toStrict Prelude.$ serialise script
 ```
 
 The next step is just a type conversion again:
 
-```
+```haskell
 successScriptSerialised :: PlutusScript PlutusScriptV2
 successScriptSerialised = PlutusScriptSerialised successScriptShortBs
 ```
 
 Finally, we expose a function that writes the `Plutus` script to a file that we will use with the actual blockchain:
 
-```
-writeSerialisedSuccessScript :: IO (Prelude.Either (FileError ()) ())
-writeSerialisedSuccessScript = writeFileTextEnvelope "compiled/SimplestSuccess.plutus" Prelude.Nothing successScriptSerialised
-```
+<pre class="language-haskell"><code class="lang-haskell"><strong>writeSerialisedSuccessScript :: IO (Prelude.Either (FileError ()) ())
+</strong>writeSerialisedSuccessScript = writeFileTextEnvelope "compiled/SimplestSuccess.plutus" Prelude.Nothing successScriptSerialised
+</code></pre>
 
 We can load up a `cabal repl`, and compile the script. Make sure you create the `compiled/` directory first.
 
-```
+```haskell
 Prelude SimplestSuccess> SimplestSuccess.writeSerialisedSuccessScript 
 Right ()
 ```

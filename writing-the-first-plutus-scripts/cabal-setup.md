@@ -13,14 +13,13 @@ cabal init
 
 This will create a default cabal project structure for us that looks like this:
 
-```bash
-├── app
-│   └── Main.hs
+<pre class="language-bash"><code class="lang-bash"><strong>├── app
+</strong>│   └── Main.hs
 ├── CHANGELOG.md
 └── hpm-validators.cabal
-```
+</code></pre>
 
-We will place all our source code in the `src/` directory so let's rename the `app` directory to `src`. Inspecting the `hpm-validators.cabal` file shows that the project was initialised as an executable, but we will be building a library of validators so we can change that to library and specify the `hs-source-dirs` to `src`. The rest of the file we can simply copy from the `plutus-scripts.cabal` template (most notably the `build-depends` section). Our complete `hpm-validators.cabal` file looks like this:
+We will place all our source code in the `src/` directory so let's rename the `app` directory to `src`. Inspecting the `hpm-validators.cabal` file shows that the project was initialised as an executable, but we will be building a library of validators so we can change that to a library and specify the `hs-source-dirs` to `src`. The rest of the file we can simply copy from the `plutus-scripts.cabal` template (most notably the `build-depends` section). Our complete `hpm-validators.cabal` file looks like this:
 
 ```haskell
 cabal-version:      2.4
@@ -284,33 +283,32 @@ source-repository-package
 
 The project structure that we will create in this course looks like this:
 
-<pre class="language-bash"><code class="lang-bash">.
+<pre class="language-bash"><code class="lang-bash">hpm-validators
 ├── cabal.project 
 ├── CHANGELOG.md
 ├── compiled                        # Compiled assets and validators 
 ├── dist-newstyle
 ├── hpm-validators.cabal
-├── src/                            # 
+├── src/                            # Haskell source code
 │   ├── DeadlineParam.hs
 <strong>│   ├── ExploringScriptContext.hs
 </strong>│   ├── GuessingGame.hs
-│   ├── Helpers
+│   ├── Helpers/
 │   ├── MintingPolicy.hs
 │   ├── SharedWallet.hs
 │   ├── SharedWalletParam.hs
 │   ├── SimplestSuccess.hs
 │   └── StakingValidator.hs
 └── testnet/                        # Scripts and files for testing validators
-    ├── address
+    ├── address/
     ├── build-addresses.sh
-    ├── DeadlineParam
-    ├── ExploringScriptContext
-    ├── GuessingGame
-    ├── MintingPolicy
-    ├── protocol.json
-    ├── SharedWallet
-    ├── SharedWalletParam
-    ├── SimplestSuccess
-    └── StakingValidator
+    ├── DeadlineParam/
+    ├── ExploringScriptContext/
+    ├── GuessingGame/
+    ├── MintingPolicy/
+    ├── SharedWallet/
+    ├── SharedWalletParam/
+    ├── SimplestSuccess/
+    └── StakingValidator/
 </code></pre>
 
