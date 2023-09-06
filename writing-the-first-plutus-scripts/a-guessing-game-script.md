@@ -185,10 +185,11 @@ cardano-cli transaction submit \
 
 If we check the UTxOs again, we'll see a new UTxO sitting at the script address. Only transactions with the matching redeemer can spend it. Let's try to first spend it with an invalid redeemer. Since the datum of the UTxO we are trying to spend needs to be specified in the transaction regardless, this is slightly pointless. But to show that the validator works as it should, let's specify the correct datum, but the wrong redeemer:
 
-<pre class="language-bash"><code class="lang-bash"><strong># testnet/GuessingGame/spend-script-utxo-invalid.sh
-</strong><strong>
-</strong><strong>#!/usr/bin/env bash
-</strong>
+```bash
+# testnet/GuessingGame/spend-script-utxo-invalid.sh
+
+#!/usr/bin/env bash
+
 NWMAGIC=2 # preview testnet
 export CARDANO_NODE_SOCKET_PATH=$CNODE_HOME/sockets/node0.socket
 
@@ -211,7 +212,7 @@ cardano-cli transaction sign \
 cardano-cli transaction submit \
     --testnet-magic $NWMAGIC \
     --tx-file tx.signed
-</code></pre>
+```
 
 Trying to execute it gives us a script execution failure:
 
