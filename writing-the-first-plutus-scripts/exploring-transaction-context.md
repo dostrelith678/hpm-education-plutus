@@ -8,10 +8,10 @@ We will now take a closer look at the third argument to Plutus validator functio
 You may hear _script context_ being called _transaction context_. Don't be confused as they mean the same thing.
 {% endhint %}
 
-In Plutus, this script context corresponds to the `ScriptContext` type. The best way to explore the structure of the `ScriptContext` type is through Haddock documentation: [https://input-output-hk.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#t:ScriptContext](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#t:ScriptContext).
+In Plutus, this script context corresponds to the `ScriptContext` type. The best way to explore the structure of the `ScriptContext` type is through [Haddock documentation](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#t:ScriptContext).
 
 {% hint style="info" %}
-Not all Plutus documentation is on the [Plutus repository](https://github.com/input-output-hk/plutus). Here, we are looking at the [plutus-apps repository documentation](https://input-output-hk.github.io/plutus-apps/main/).
+Here, we are looking at the [plutus-apps repository Haddock documentation](https://input-output-hk.github.io/plutus-apps/main/).
 {% endhint %}
 
 We can see that it consists of two fields:
@@ -64,7 +64,7 @@ Now that we have a theoretical overview of the script context, let's write a sim
 
 #### A note on Cardano transaction validity ranges
 
-Cardano transactions contain a  `txInfoValidRange`, which defines the range of _slots_ between which the transaction is valid. There are two layers of checking the valid range for a transaction. The first one happens when a `cardano-node` receives the transaction. The first thing the node does when considering a transaction is check its valid range - if the current slot does not fall into the valid range of the transaction, it is immediately discarded without doing anything else (including running a possible validator script in the transaction). The second layer is optional and can be specified in the validator script itself. This is done by accessing the `txInfoValidRange` from the `ScriptContext` and performing arbitrary checks against it.
+Cardano transactions contain a `txInfoValidRange`, which defines the range of _slots_ between which the transaction is valid. There are two layers of checking the valid range for a transaction. The first one happens when a `cardano-node` receives the transaction. The first thing the node does when considering a transaction is check its valid range - if the current slot does not fall into the valid range of the transaction, it is immediately discarded without doing anything else (including running a possible validator script in the transaction). The second layer is optional and can be specified in the validator script itself. This is done by accessing the `txInfoValidRange` from the `ScriptContext` and performing arbitrary checks against it.
 
 ### Writing the validator
 
