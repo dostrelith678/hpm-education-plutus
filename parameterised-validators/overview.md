@@ -6,6 +6,6 @@ It is important to note that, as always, validator scripts are compiled down to 
 
 `ValidatorParam(s) -> DatumType -> RedeemerType -> ScriptContext -> Bool`.
 
-The new argument `ValidatorParam` allows us to bake in any data we want into the script itself. We can define it with as many fields as we want, but as before, unless we use types that are already instances of `ToData` typeclass, we have to instantiate them and additionally, with parameter types, we have to _**lift**_ them. Lifting values or types means compiling the Haskell code to Plutus Core at runtime. The result of a lifted `Integer` for example is `CompiledCode Integer`.&#x20;
+The new argument `ValidatorParam` allows us to bake in any data we want into the script itself. We can define it with as many fields as we want, but as before, unless we use types that are already instances of `ToData` typeclass, we have to instantiate them and additionally, with parameter types, we have to _**lift**_ them. Lifting values or types means compiling the Haskell code to Plutus IR (intermediate representation, which is later compiled into Plutus Core) at runtime. The result of a lifted `Integer` for example is `CompiledCode Integer`.&#x20;
 
 As with [typed validators](broken-reference), we can still define our own `Datum` and `Redeemer` types. And we have to create the `ValidatorTypes` instance to use with our validator as before.
