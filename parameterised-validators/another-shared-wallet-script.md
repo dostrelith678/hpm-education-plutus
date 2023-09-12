@@ -10,7 +10,7 @@ Firstly, we create the same type as before, this time calling it `sharedParam`:
 data SharedWalletParam = SharedWalletParam {
     wallet1 :: Plutus.PubKeyHash,
     wallet2 :: Plutus.PubKeyHash
-  }
+}
 ```
 
 As before, we need to make our parameter type an instance of `ToData`/`FromData` via `PlutusTx.unstableMakeIsData`:
@@ -83,7 +83,7 @@ Besides the `DataKind` extension we enabled when working with typed validators, 
 {-# LANGUAGE MultiParamTypeClasses #-}
 ```
 
-And finally, we define the functions to serialise and write the script file:
+Finally, we define the functions to serialise and write the script file:
 
 ```haskell
 sharedWalletParamShortBs :: SharedWalletParam -> SBS.ShortByteString
