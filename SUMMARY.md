@@ -37,7 +37,7 @@
 ## Stake Validators
 
 * [Overview](stake-validators/overview.md)
-* [A Stake Validator Script](stake-validators/a-stake-validator-script.md)
+* [A Stake Validator Script](stake-validators/a-staking-validator-script.md)
 
 ## Minting Policies
 

@@ -12,10 +12,10 @@ A Cardano base address (Shelley-based) is composed of two parts, the payment par
 
 Now, with Plutus, the Shelley-based model of addresses remains the same, but we are no longer limited to controlling address validation with just the usual key pairs. Instead, we can create addresses that are composed of two scripts, the payment script (which are scripts that we have been writing so far), and the stake script (which is what we will be writing shortly). This way, we can have arbitrary logic of scripts take over both the payment and the stake part of addresses. We can also make all other possible permutations to build addresses. For example, we can use a payment script and a staking key to create an address that uses script logic to spend its UTxO, but the staking actions of the address are controlled by a staking key. Or we could make an address that uses a payment key and a stake validator. Beautiful.
 
-To confirm this, check the `cardano-cli address build` command:
+To confirm this, check the `cardano-cli address build --help` command:
 
 ```bash
-cardano-cli address build
+cardano-cli address build --help
 
     Build a Shelley payment address, with optional delegation to a stake address.
 
@@ -42,7 +42,7 @@ Available options:
 
 It gives the option to provide either the keys or a script file for both payment and stake parts (`--payment-script-file` / `--stake-script-file`).
 
-### The StakeValidator type
+### The _StakeValidator_ type
 
 [`StakeValidator`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger/html/Ledger-Typed-Scripts.html#t:UntypedStakeValidator) has a slightly different type signature than the regular validators because it does not accept `datum` as the first argument. That makes sense since the datum sits at the UTxO, and we are not dealing with spending UTxO here, only with validating staking actions. Therefore, it only receives the `redeemer` and `context` to return a boolean value:
 
@@ -78,9 +78,8 @@ data Credential
 
 For [`Certifying DCert`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V2-Ledger-Api.html#t:DCert), we dive into `DCert` definition:
 
-```haskell
-data DCert
-  = DCertDelegRegKey StakingCredential
+<pre class="language-haskell"><code class="lang-haskell"><strong>data DCert
+</strong>  = DCertDelegRegKey StakingCredential
   | DCertDelegDeRegKey StakingCredential
   | DCertDelegDelegate
       StakingCredential
@@ -99,7 +98,7 @@ data DCert
     DCertGenesis
   | -- | Another really terse Digest
     DCertMir
-```
+</code></pre>
 
 This is the full definition of `DCert` and it contains fields not really related to delegation per se (`DCertGenesis` and `DCertMir`). We can also see certificates related to pool registration/de-registration which we are not interested in from the POV of `StakeValidator` (`DCertPoolRetire` and `DCertPoolRegister`). This leaves just the ones related to the delegation from the delegator's POV, which is the `StakeValidator` POV:
 

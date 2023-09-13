@@ -62,7 +62,7 @@ The `cert` field will contain an `Integer` code that must be specified in the re
 data CodeValidator
 instance PSU.ValidatorTypes CodeValidator where
   type instance RedeemerType CodeValidator = Integer
-  -- we only care about the redeemer type for the stake validator
+  -- We only care about the redeemer type for the stake validator
 ```
 
 We now have everything to create the `mkStakingValidator` function which will represent our stake validator logic:
