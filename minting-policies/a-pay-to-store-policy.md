@@ -107,7 +107,7 @@ import qualified Plutus.V1.Ledger.Value as PlutusV1
 import Prelude (IO)
 ```
 
-Once our logic is complete, we need to apply our parameter to the function and create a `MintingPolicy` via `PlutusV2.mkMintingPolicyScript`. Since we are creating a parameterised script, we need to lift and apply our `tsp` parameter to our `mkPolicy` function as we did with our [`StakingValidator`](../stake-validators/a-staking-validator-script.md):
+Once our logic is complete, we need to apply our parameter to the function and create a `MintingPolicy` via `PlutusV2.mkMintingPolicyScript`. Since we are creating a parameterised script, we need to lift and apply our `tsp` parameter to our `mkPolicy` function as we did with our [`StakingValidator`](../stake-validators/a-stake-validator-script.md):
 
 ```haskell
 policy :: TokenSaleParams -> Scripts.MintingPolicy

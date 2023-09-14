@@ -161,7 +161,7 @@ writeJSONData :: PlutusTx.ToData a => String -> a -> IO ()
 writeJSONData filePath pData = LBS.writeFile filePath $ plutusDataToJSON pData
 ```
 
-We can now load and use this function to write a unit `()` datum file. Make sure your create the `compiled/assets/` directory first.
+This is mostly boilerplate code that we don't need to think too much about. It simply takes some data of the [`ToData`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V2-Ledger-Api.html#t:ToData) class and serialises it to a JSON that `cardano-cli` expects. We can now load and use this function anytime we need to write a datum file. Here, we just want to write a unit `()` datum file. Make sure you create the `compiled/assets/` directory before running the code below first.
 
 <pre class="language-haskell"><code class="lang-haskell"><strong>Prelude> :l src/Helpers/Utils.hs
 </strong><strong>Ok, one module loaded.
@@ -185,7 +185,7 @@ library
 
 ### Testing the validator
 
-To start testing our validators, we will need to create some regular Cardano addresses on the testnet and use the faucet to get some tADA. We will use these to pay the fees for the transactions we create as well as the collateral inputs. We will build two addresses now and use them throughout the course with different validators. Let's place all our testing files in the `testnet/` directory of the project root. Below is a `bash` script that creates the addresses for us (you can also use `cardano-cli` directly). Make sure you create the `testnet/addresses/` directory beforehand.
+To start testing our validators, we will need to create some regular Cardano addresses on the testnet and use the faucet to get some tADA. We will use these to pay the fees for the transactions we create as well as the collateral inputs. We will build two addresses now and use them throughout the course with different validators. Let's place all our testing files in the `testnet/` directory of the project root. Below is a `bash` script that creates the addresses for us (you can also use `cardano-cli` directly in the terminal). Make sure you create the `testnet/addresses/` directory beforehand.
 
 {% hint style="warning" %}
 _**We always test our validators from OUTSIDE the**** ****`nix-shell`****, i.e. with our local node that is synced. The**** ****`nix-shell`**** ****provides ONLY a development environment for writing and serialising Plutus validators.**_

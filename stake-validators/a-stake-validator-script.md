@@ -407,3 +407,16 @@ cardano-cli transaction submit \
 Estimated transaction fee: Lovelace 309296
 Transaction successfully submitted.
 ```
+
+After a couple of days and pool blocks produced, rewards will be available at the stake address we created with the validator.
+
+<pre class="language-bash"><code class="lang-bash"><strong>./check-script-rewards.sh
+</strong><strong>Script address:
+</strong>[
+    {
+        "address": "stake_test17peya46y0tymw8cq6hgdlzdlrys58acwsww4luzk0yur9vgy0xqrc",
+        "delegation": "pool1x9xkvkrfw6htmnflpad0z2aqsxx50f5mwkyzpylw0tlsk9z5uff",
+        "rewardAccountBalance": 49443941
+    }
+]
+</code></pre>
