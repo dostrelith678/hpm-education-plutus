@@ -85,12 +85,13 @@ mkTypedValidator ::
 
 It accepts a compiled code of a typed validator (with some `ValidatorType a`) and a wrapper that is a function of compiled code `ValidatorType a -> WrappedValidatorType`. The `WrappedValidatorType` is simply a synonym for the basic validator function `BuiltinData -> BuiltinData -> BuiltinData -> ()`. That wrapper function for us is simply `PSU.mkUntypedValidator` which has the type signature:
 
-<pre class="language-haskell"><code class="lang-haskell"><strong>mkUntypedValidator
-</strong>    :: forall d r
+```haskell
+mkUntypedValidator
+    :: forall d r
     . (PV1.UnsafeFromData d, PV1.UnsafeFromData r)
     => (d -> r -> sc -> Bool)
     -> UntypedValidator
-</code></pre>
+```
 
 What this means is simply that instead of compiling just the validator function to Plutus core with `$$(PlutusTx.compile [|| mkValidator ||])`, we also need to compile this wrapper. So `PSU.V2.mkTypedValidator` ends up being applied to both of the compiled code instances:
 
@@ -209,12 +210,13 @@ Next, update the `exposed-modules` in the `.cabal` file of the project for `Shar
 
 &#x20;We are now ready to load up our `cabal repl` and start importing:
 
-<pre class="language-haskell"><code class="lang-haskell">Prelude SimplestSuccess> import SharedWallet 
+```haskell
+Prelude SimplestSuccess> import SharedWallet 
 Prelude SharedWallet SimplestSuccess> import Helpers.Utils 
 Prelude SharedWallet Helpers.Utils SimplestSuccess> :set -XOverloadedStrings
-<strong>Prelude SharedWallet Helpers.Utils SimplestSuccess> myDatum = SharedDatum "a5d318dadfb52eeffb260ae097f846aea0ca78e6cc4fe406d4ceedc0" "1b1e5895b03302b248e8c459817bab49471c4013a0806ac52cb73f9b"
-</strong>Prelude SharedWallet Helpers.Utils SimplestSuccess> writeJSONData "compiled/assets/SharedDatum.json"
-</code></pre>
+Prelude SharedWallet Helpers.Utils SimplestSuccess> myDatum = SharedDatum "a5d318dadfb52eeffb260ae097f846aea0ca78e6cc4fe406d4ceedc0" "1b1e5895b03302b248e8c459817bab49471c4013a0806ac52cb73f9b"
+Prelude SharedWallet Helpers.Utils SimplestSuccess> writeJSONData "compiled/assets/SharedDatum.json"
+```
 
 We used `:set -XOverloadedStrings` to enable the overloaded strings extension inside the REPL in order for it to be able to interpret our strings as `PubKeyHash`es, which is the type our datum requires. We end up with the following in `compiled/assets/SharedDatum.json`:
 
