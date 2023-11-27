@@ -1,6 +1,6 @@
 # A Pay-to-Store Policy
 
-This script will be a parameterised policy script that allows the minting of tokens if a certain amount of ADA is paid to the store address as part of the minting transaction.
+This script will be a [parameterised](broken-reference) minting policy script that allows the minting of tokens if a certain amount of ADA is paid to the store address as part of the minting transaction.
 
 ### Writing the validator
 
@@ -9,15 +9,15 @@ We can start by creating the `TokenSaleParams` that will consist of the store ad
 ```haskell
 data TokenSaleParams = TokenSaleParams
     {
-        store :: PlutusV2.Address,
-        tName :: PlutusV2.TokenName,
-        tPrice :: Integer -- price in ADA per token
+        store :: PlutusV2.Address,   -- public address of the token store
+        tName :: PlutusV2.TokenName, -- name of the token to be minted
+        tPrice :: Integer            -- price in ADA per token
     } 
 PlutusTx.unstableMakeIsData ''TokenSaleParams
 PlutusTx.makeLift ''TokenSaleParams
 ```
 
-The next part is writing the `mkPolicy` function that will represent our minting logic. We will need quite a bit of helper functions here. First, let's deconstruct `info` and `txOuts` from the transaction context.
+The next part is writing the `mkPolicy` function that will represent our minting logic. We will need quite a bit of helper functions here. First, define the main behaviour of the function which is to use the `checkMint` function in order to determine whether minting is allowed and write a trace `Invalid mint` if it is not. Then, we start writing our helper functions for deconstructing `info` and `txOuts` from the transaction context.
 
 ```haskell
 mkPolicy ::  TokenSaleParams -> BuiltinData -> PlutusV2.ScriptContext -> Bool
