@@ -18,7 +18,7 @@ _Plutus Application Backend (PAB)_ - a web server library that manages the state
 
 _Various other libraries_ - provide a full framework for writing Plutus applications. A full list can be found [here](https://plutus-apps.readthedocs.io/en/latest/plutus/explanations/plutus-tools-component-descriptions.html#plutus-tools-in-development).
 
-All these tools are located in the [_plutus-apps_ repository](https://github.com/intersectMBOutus-apps)..com/intersectMBO
+All these tools are located in the [plutus-apps_ repository](https://github.com/intersectMBO/plutus-apps).
 
 <figure><img src="../.gitbook/assets/image.png" alt=""><figcaption><p>A high-level architecture of the Plutus Platform, with an emphasis on applications (<a href="https://ci.iog.io/build/65553/download/1/plutus.pdf">https://ci.iog.io/build/65553/download/1/plutus.pdf</a>).</p></figcaption></figure>
 
