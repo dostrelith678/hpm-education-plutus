@@ -24,7 +24,7 @@ Inside the function, we want to check that the `txInfoValidRange` is contained i
 Important to note that the _**ENTIRE**_ transaction validity range must fall into this interval because if the positive end of the valid range would go over the deadline, the transaction would be validated after the deadline even if the majority of the valid range is before the deadline!
 {% endhint %}
 
-We will need to use some functions from the [`Interval` module](https://input-output-hk.github.io/plutus/master/plutus-ledger-api/html/PlutusLedgerApi-V1-Interval.html) to determine that, namely `contains` and `to`.&#x20;
+We will need to use some functions from the [`Interval` module](https://intersectMBO.github.io/plutus/master/plutus-ledger-api/html/PlutusLedgerApi-V1-Interval.html) to determine that, namely `contains` and `to`.&#x20;
 
 ```haskell
 import Plutus.V1.Ledger.Interval (contains, to)

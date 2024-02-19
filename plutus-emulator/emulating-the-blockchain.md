@@ -1,6 +1,6 @@
 # Emulating the blockchain
 
-So far, we have been using the `cardano-node` to submit transactions to the testnet in order to interact with our validators. While this is a valid way of investigating and testing behaviour, it can become tedious. Fortunately, we have another way of testing validators through _simulation_ using the [`Plutus.Trace.Emulator` module](https://input-output-hk.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html). This module can be used to create a temporary emulated blockchain for testing validators without the need for an actual live Cardano network (such as preview, preprod or mainnet).
+So far, we have been using the `cardano-node` to submit transactions to the testnet in order to interact with our validators. While this is a valid way of investigating and testing behaviour, it can become tedious. Fortunately, we have another way of testing validators through _simulation_ using the [`Plutus.Trace.Emulator` module](https://intersectMBO.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html). This module can be used to create a temporary emulated blockchain for testing validators without the need for an actual live Cardano network (such as preview, preprod or mainnet).
 
 The two main components for emulation are the `Contract` monad and the `EmulatorTrace` monad. The `Contract` monad represents the off-chain code, i.e. the code that builds and submits transactions for `cardano-node` to validate. The `EmulatorTrace` monad is a contract trace that can be run in the Plutus emulator and prints information about the emulated blockchain, its transactions and wallet/script balances.
 
@@ -10,11 +10,11 @@ We will first take a closer look at `EmulatorTrace`. We can run it without testi
 ghci> import Plutus.Trace.Emulator
 ```
 
-The function we generally want to use for emulation is `runEmulatorTraceIO` which gives us the most meaningful information printed to `stdout`. We can check its signature on Haddock ([https://input-output-hk.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#v:runEmulatorTraceIO](https://input-output-hk.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#v:runEmulatorTraceIO)):
+The function we generally want to use for emulation is `runEmulatorTraceIO` which gives us the most meaningful information printed to `stdout`. We can check its signature on Haddock ([https://intersectMBO.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#v:runEmulatorTraceIO](https://intersectMBO.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#v:runEmulatorTraceIO)):
 
 `runEmulatorTraceIO :: EmulatorTrace () -> IO ()`.
 
-It accepts an `EmulatorTrace` and returns an `IO ()`. So what is an [`EmulatorTrace`](https://input-output-hk.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#t:EmulatorTrace)? Well, it has a somewhat complex definition that we do not really need to understand in detail:
+It accepts an `EmulatorTrace` and returns an `IO ()`. So what is an [`EmulatorTrace`](https://intersectMBO.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#t:EmulatorTrace)? Well, it has a somewhat complex definition that we do not really need to understand in detail:
 
 ```haskell
 type EmulatorEffects = StartContract
@@ -101,6 +101,6 @@ Okay, we got an emulated blockchain! The only transaction we can see is the init
 
 We can also see that the log messages regarding new blocks are duplicated for each of the wallets: `Slot 00001: W[1]: InsertionSuccess: New tip is Tip(Slot 1, BlockId 9e944371f5292bcd66e4e498bbc313b92ae884154f0eca1ddf75cd0ec69ddc47, BlockNumber 0). UTxO state was added to the end.`.
 
-An advanced question would be how to configure the emulation differently, for example, with a different initial ADA distribution or with a different trace format. The defaults will do just fine for examples in this course, but for those interested, there is another function [`runEmulatorTraceIO'`](https://input-output-hk.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#v:runEmulatorTraceIO-39-) which accepts additional configurations that can be customised:`runEmulatorTraceIO' :: TraceConfig -> EmulatorConfig -> EmulatorTrace () -> IO ()`
+An advanced question would be how to configure the emulation differently, for example, with a different initial ADA distribution or with a different trace format. The defaults will do just fine for examples in this course, but for those interested, there is another function [`runEmulatorTraceIO'`](https://intersectMBO.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#v:runEmulatorTraceIO-39-) which accepts additional configurations that can be customised:`runEmulatorTraceIO' :: TraceConfig -> EmulatorConfig -> EmulatorTrace () -> IO ()`
 
-If you are interested, you can dive down into the definitions of [`TraceConfig`](https://input-output-hk.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#t:TraceConfig) and [`EmulatorConfig`](https://input-output-hk.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#t:EmulatorConfig).
+If you are interested, you can dive down into the definitions of [`TraceConfig`](https://intersectMBO.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#t:TraceConfig) and [`EmulatorConfig`](https://intersectMBO.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#t:EmulatorConfig).

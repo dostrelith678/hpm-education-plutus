@@ -60,13 +60,13 @@ The following two options `default-language` and `ghc-options` specify the langu
 
 [_Reference_](https://cabal.readthedocs.io/en/stable/cabal-project.html)
 
-The `cabal.project` file supports a variety of options that configure the details of your build. Perhaps most importantly, it specifies dependencies which are not on Hackage. In `plutus-scripts`, the first definition in the file is for the [Cardano Haskell package repository](https://input-output-hk.github.io/cardano-haskell-packages/) which aims to be the central package repository for Cardano-related packages not found on Hackage.
+The `cabal.project` file supports a variety of options that configure the details of your build. Perhaps most importantly, it specifies dependencies which are not on Hackage. In `plutus-scripts`, the first definition in the file is for the [Cardano Haskell package repository](https://intersectMBO.github.io/cardano-haskell-packages/) which aims to be the central package repository for Cardano-related packages not found on Hackage.
 
 ```haskell
 -- Custom repository for cardano haskell packages
 -- See https://github.com/input-output-hk/cardano-haskell-packages on how to use CHaP in a Haskell project.
 repository cardano-haskell-packages
-  url: https://input-output-hk.github.io/cardano-haskell-packages
+  url: https://intersectMBO.github.io/cardano-haskell-packages
   secure: True
   root-keys:
     3e0cce471cf09815f930210f7827266fd09045445d65923e6d0238a6cd15126f

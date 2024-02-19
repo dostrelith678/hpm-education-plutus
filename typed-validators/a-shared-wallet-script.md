@@ -31,7 +31,7 @@ import qualified Ledger.Typed.Scripts as Scripts
 ...
 ```
 
-Next, we need to write the `mkValidator` logic. As before, we need to destructure the transaction context to get `TxInfo`, and use the [`txSignedBy` ](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V2-Ledger-Contexts.html#v:txSignedBy)function from `Plutus.V2.Ledger.Contexts` to check for the signature. `txSignedBy` accepts two arguments, one of type `TxInfo` and the other `PubKeyHash`, returning `True` if the signature is present:
+Next, we need to write the `mkValidator` logic. As before, we need to destructure the transaction context to get `TxInfo`, and use the [`txSignedBy` ](https://intersectMBO.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V2-Ledger-Contexts.html#v:txSignedBy)function from `Plutus.V2.Ledger.Contexts` to check for the signature. `txSignedBy` accepts two arguments, one of type `TxInfo` and the other `PubKeyHash`, returning `True` if the signature is present:
 
 `txSignedBy :: TxInfo -> Plutus.V1.Ledger.Crypto.PubKeyHash -> Bool`
 

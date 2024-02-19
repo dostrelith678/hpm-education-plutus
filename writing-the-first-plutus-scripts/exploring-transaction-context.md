@@ -8,10 +8,10 @@ We will now take a closer look at the third argument to Plutus validator functio
 You may hear _script context_ being called _transaction context_. Don't be confused as they mean the same thing.
 {% endhint %}
 
-In Plutus, this script context corresponds to the `ScriptContext` type. The best way to explore the structure of the `ScriptContext` type is through [Haddock documentation](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#t:ScriptContext).
+In Plutus, this script context corresponds to the `ScriptContext` type. The best way to explore the structure of the `ScriptContext` type is through [Haddock documentation](https://intersectMBO.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#t:ScriptContext).
 
 {% hint style="info" %}
-Here, we are looking at the [plutus-apps repository Haddock documentation](https://input-output-hk.github.io/plutus-apps/main/).
+Here, we are looking at the [plutus-apps repository Haddock documentation](https://intersectMBO.github.io/plutus-apps/main/).
 {% endhint %}
 
 We can see that it consists of two fields:
@@ -84,7 +84,7 @@ mkValidator _ _ ctx =
     else error ()
 ```
 
-Now we need to write the helper functions which is a bit more complicated as they have to work with the script `context`. Firstly, to even access the `context` in the structure of `ScriptContext` we explored, we have to build that structure from the third argument `ctx`, which is of type `BuiltinData`. We can do this transformation by using [`unsafeFromBuiltinData` ](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V2-Ledger-Api.html#v:unsafeFromBuiltinData)function on `ctx` (the difference between `unsafeFromBuiltinData` and `fromBuiltinData` is that the former will error if it fails which is faster, while the latter will return `Nothing`). This leads to our first helper function:
+Now we need to write the helper functions which is a bit more complicated as they have to work with the script `context`. Firstly, to even access the `context` in the structure of `ScriptContext` we explored, we have to build that structure from the third argument `ctx`, which is of type `BuiltinData`. We can do this transformation by using [`unsafeFromBuiltinData` ](https://intersectMBO.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V2-Ledger-Api.html#v:unsafeFromBuiltinData)function on `ctx` (the difference between `unsafeFromBuiltinData` and `fromBuiltinData` is that the former will error if it fails which is faster, while the latter will return `Nothing`). This leads to our first helper function:
 
 `valCtx = Plutus.unsafeFromBuiltinData ctx`
 
@@ -131,7 +131,7 @@ Couldn't match expected type ‘BuiltinString’
         ‘"Tx does not have infinite range!"’
 ```
 
-The `traceIfFalse` function is expecting a `BuiltinString` but we are passing it a regular Haskell string. We can solve this with the `stringToBuiltinString` function from [`PlutusTx.Builtins.Class`](https://input-output-hk.github.io/plutus/master/plutus-tx/html/PlutusTx-Builtins-Class.html#v:stringToBuiltinString). Add an import for this function and apply it to the trace message string in the `checkOutputs` and `checkRange` functions:
+The `traceIfFalse` function is expecting a `BuiltinString` but we are passing it a regular Haskell string. We can solve this with the `stringToBuiltinString` function from [`PlutusTx.Builtins.Class`](https://intersectMBO.github.io/plutus/master/plutus-tx/html/PlutusTx-Builtins-Class.html#v:stringToBuiltinString). Add an import for this function and apply it to the trace message string in the `checkOutputs` and `checkRange` functions:
 
 ```haskell
 import PlutusTx.Builtins.Class (stringToBuiltinString)

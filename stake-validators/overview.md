@@ -44,7 +44,7 @@ It gives the option to provide either the keys or a script file for both payment
 
 ### The _StakeValidator_ type
 
-[`StakeValidator`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger/html/Ledger-Typed-Scripts.html#t:UntypedStakeValidator) has a slightly different type signature than the regular validators because it does not accept `datum` as the first argument. That makes sense since the datum sits at the UTxO, and we are not dealing with spending UTxO here, only with validating staking actions. Therefore, it only receives the `redeemer` and `context` to return a boolean value:
+[`StakeValidator`](https://intersectMBO.github.io/plutus-apps/main/plutus-ledger/html/Ledger-Typed-Scripts.html#t:UntypedStakeValidator) has a slightly different type signature than the regular validators because it does not accept `datum` as the first argument. That makes sense since the datum sits at the UTxO, and we are not dealing with spending UTxO here, only with validating staking actions. Therefore, it only receives the `redeemer` and `context` to return a boolean value:
 
 `type UntypedStakeValidator = BuiltinData -> BuiltinData -> ()`
 
@@ -60,7 +60,7 @@ data ScriptPurpose
     | Certifying DCert
 ```
 
-If we dive into the [`Rewarding StakingCredential`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V1-Ledger-Api.html#g:13), we will find the `StakingHash` constructor with the generic `Credential` type (the other is a pointer address, which we will not go into here, but here is a reference for those interested: [https://docs.cardano.org/learn/cardano-addresses](https://docs.cardano.org/learn/cardano-addresses)):
+If we dive into the [`Rewarding StakingCredential`](https://intersectMBO.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V1-Ledger-Api.html#g:13), we will find the `StakingHash` constructor with the generic `Credential` type (the other is a pointer address, which we will not go into here, but here is a reference for those interested: [https://docs.cardano.org/learn/cardano-addresses](https://docs.cardano.org/learn/cardano-addresses)):
 
 ```haskell
 data StakingCredential
@@ -76,7 +76,7 @@ data Credential
   | ScriptCredential ValidatorHash
 ```
 
-For [`Certifying DCert`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V2-Ledger-Api.html#t:DCert), we dive into `DCert` definition:
+For [`Certifying DCert`](https://intersectMBO.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V2-Ledger-Api.html#t:DCert), we dive into `DCert` definition:
 
 <pre class="language-haskell"><code class="lang-haskell"><strong>data DCert
 </strong>  = DCertDelegRegKey StakingCredential

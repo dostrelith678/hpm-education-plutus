@@ -6,7 +6,7 @@ As mentioned in the [EUTxO overview](../the-eutxo-model/introduction-to-the-eutx
 2. `Redeemer`
 3. `Context`
 
-The Haddock documentation for Plutus specifies the main modules ([https://input-output-hk.github.io/plutus/master/](https://input-output-hk.github.io/plutus/master/)):
+The Haddock documentation for Plutus specifies the main modules ([https://intersectMBO.github.io/plutus/master/](https://intersectMBO.github.io/plutus/master/)):
 
 ```
 PlutusTx: Compiling Haskell to PLC (Plutus Core; on-chain code).
@@ -70,9 +70,9 @@ When we write a validator we define a function that receives the three aforement
 
 `mkValidator :: Datum -> Redeemer -> Context -> ()`.
 
-But what are the types of `Datum`, `Redeemer` and `Context`? It turns out that in Plutus, all three of the validation arguments need to come in a type of `Data`. We can explore the Haddock pages to learn more about it: [https://input-output-hk.github.io/plutus/master/plutus-core/html/PlutusCore-Data.html#t:Data](https://input-output-hk.github.io/plutus/master/plutus-core/html/PlutusCore-Data.html#t:Data).
+But what are the types of `Datum`, `Redeemer` and `Context`? It turns out that in Plutus, all three of the validation arguments need to come in a type of `Data`. We can explore the Haddock pages to learn more about it: [https://intersectMBO.github.io/plutus/master/plutus-core/html/PlutusCore-Data.html#t:Data](https://intersectMBO.github.io/plutus/master/plutus-core/html/PlutusCore-Data.html#t:Data).
 
-We see that the `Data` type comes with several constructors, but the main takeaway is that it is a generic data type that can represent various things such as integers, byte strings, lists, and maps. Plutus also features a `BuiltinData` type ([https://input-output-hk.github.io/plutus/master/plutus-tx/html/PlutusTx-Builtins.html#g:4](https://input-output-hk.github.io/plutus/master/plutus-tx/html/PlutusTx-Builtins.html#g:4)) that can be used directly in the on-chain code.
+We see that the `Data` type comes with several constructors, but the main takeaway is that it is a generic data type that can represent various things such as integers, byte strings, lists, and maps. Plutus also features a `BuiltinData` type ([https://intersectMBO.github.io/plutus/master/plutus-tx/html/PlutusTx-Builtins.html#g:4](https://intersectMBO.github.io/plutus/master/plutus-tx/html/PlutusTx-Builtins.html#g:4)) that can be used directly in the on-chain code.
 
 So we can now write the type signature of our validator function using the `BuiltinData` type for its arguments and returning `()`:&#x20;
 
@@ -93,9 +93,9 @@ validator :: Plutus.Validator
 validator = Plutus.mkValidatorScript $$(PlutusTx.compile [|| mkValidator ||])
 ```
 
-The unusual syntax above is template Haskell: `$$([|| ||])`. The function [`Plutus.mkValidatorScript`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#v:mkValidatorScript) requires a Plutus Core argument so the `mkValidator` is first compiled to Plutus Core. In order for this to work, the compiled function `mkValidator` must be made inlinable with `{-# INLINABLE mkValidator #-}` that we specified earlier.
+The unusual syntax above is template Haskell: `$$([|| ||])`. The function [`Plutus.mkValidatorScript`](https://intersectMBO.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#v:mkValidatorScript) requires a Plutus Core argument so the `mkValidator` is first compiled to Plutus Core. In order for this to work, the compiled function `mkValidator` must be made inlinable with `{-# INLINABLE mkValidator #-}` that we specified earlier.
 
-Part 3 of our three steps is arguably the simplest. We need to unwrap the validator to get the script. This is just a necessary step to conform with the expected types. Since [`Plutus.Validator`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#t:Validator) is a wrapper around [`Plutus.Script`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#t:Script) which is used as the actual validator in the ledger, we need to unwrap it.
+Part 3 of our three steps is arguably the simplest. We need to unwrap the validator to get the script. This is just a necessary step to conform with the expected types. Since [`Plutus.Validator`](https://intersectMBO.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#t:Validator) is a wrapper around [`Plutus.Script`](https://intersectMBO.github.io/plutus-apps/main/plutus-ledger/html/Ledger.html#t:Script) which is used as the actual validator in the ledger, we need to unwrap it.
 
 ```haskell
 script :: Plutus.Script
@@ -161,7 +161,7 @@ writeJSONData :: PlutusTx.ToData a => String -> a -> IO ()
 writeJSONData filePath pData = LBS.writeFile filePath $ plutusDataToJSON pData
 ```
 
-This is mostly boilerplate code that we don't need to think too much about. It simply takes some data of the [`ToData`](https://input-output-hk.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V2-Ledger-Api.html#t:ToData) class and serialises it to a JSON that `cardano-cli` expects. We can now load and use this function anytime we need to write a datum file. Here, we just want to write a unit `()` datum file. Make sure you create the `compiled/assets/` directory before running the code below first.
+This is mostly boilerplate code that we don't need to think too much about. It simply takes some data of the [`ToData`](https://intersectMBO.github.io/plutus-apps/main/plutus-ledger-api/html/Plutus-V2-Ledger-Api.html#t:ToData) class and serialises it to a JSON that `cardano-cli` expects. We can now load and use this function anytime we need to write a datum file. Here, we just want to write a unit `()` datum file. Make sure you create the `compiled/assets/` directory before running the code below first.
 
 <pre class="language-haskell"><code class="lang-haskell"><strong>Prelude> :l src/Helpers/Utils.hs
 </strong><strong>Ok, one module loaded.

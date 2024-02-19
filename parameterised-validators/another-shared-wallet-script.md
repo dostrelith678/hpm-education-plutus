@@ -19,7 +19,7 @@ As before, we need to make our parameter type an instance of `ToData`/`FromData`
 PlutusTx.unstableMakeIsData ''SharedWalletParam
 ```
 
-In addition, when defining custom parameter types, we need to make them an instance of the [`Lift` class](https://input-output-hk.github.io/plutus/master/plutus-tx/html/PlutusTx.html#t:Lift). This allows the type to be lifted into so-called _Plutus IR_ (intermediate representation), which is then handled further to Plutus Core, but essentially, we just need this to allow the compiler to compile our type to Plutus Core. This is done with the `PlutusTx.makeLift` function that automatically derives an instance for us:
+In addition, when defining custom parameter types, we need to make them an instance of the [`Lift` class](https://intersectMBO.github.io/plutus/master/plutus-tx/html/PlutusTx.html#t:Lift). This allows the type to be lifted into so-called _Plutus IR_ (intermediate representation), which is then handled further to Plutus Core, but essentially, we just need this to allow the compiler to compile our type to Plutus Core. This is done with the `PlutusTx.makeLift` function that automatically derives an instance for us:
 
 ```haskell
 PlutusTx.makeLift ''SharedWalletParam

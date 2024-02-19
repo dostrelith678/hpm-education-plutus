@@ -78,7 +78,7 @@ mkStakingValidator cp redeemer ctx =
 
 We simply need to check that the `redeemer` matches the corresponding action. Any script purpose other than `Certifying` or `Rewarding` will always be `False`.
 
-Next, we need to compile that function into a `StakeValidator` type with the end goal of the `UntypedStakeValidator` that we looked at earlier. Since there is still no interface `TypedStakeValidator`, we have to use somewhat explicit code with `mkStakeValidatorScript` and [`mkUntypedStakeValidator`](https://input-output-hk.github.io/plutus-apps/main/plutus-script-utils/html/Plutus-Script-Utils-Typed.html#v:mkUntypedStakeValidator). This function is defined as:
+Next, we need to compile that function into a `StakeValidator` type with the end goal of the `UntypedStakeValidator` that we looked at earlier. Since there is still no interface `TypedStakeValidator`, we have to use somewhat explicit code with `mkStakeValidatorScript` and [`mkUntypedStakeValidator`](https://intersectMBO.github.io/plutus-apps/main/plutus-script-utils/html/Plutus-Script-Utils-Typed.html#v:mkUntypedStakeValidator). This function is defined as:
 
 ```haskell
 mkUntypedStakeValidator

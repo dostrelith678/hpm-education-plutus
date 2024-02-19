@@ -80,7 +80,7 @@ But we will get the following error:
         arising from a use of ‘writeJSONData’
 ```
 
-It seems that `PlutusTx.toData` class does not implement an instance for the `String` type. Indeed, if we check the [documentation](https://input-output-hk.github.io/plutus/master/plutus-tx/html/PlutusTx-IsData-Class.html), we see that only a `ToData BuiltinByteString` is defined when it comes to string-like values. So we need to convert our Haskell `String` to a Plutus `BuiltinByteString`. Again we need to look through the [documentation](https://input-output-hk.github.io/plutus/master/plutus-tx/html/PlutusTx-Builtins-Class.html#v:stringToBuiltinByteString) to find the function we need (located in the `PlutusTx.Builtins.Class` module):
+It seems that `PlutusTx.toData` class does not implement an instance for the `String` type. Indeed, if we check the [documentation](https://intersectMBO.github.io/plutus/master/plutus-tx/html/PlutusTx-IsData-Class.html), we see that only a `ToData BuiltinByteString` is defined when it comes to string-like values. So we need to convert our Haskell `String` to a Plutus `BuiltinByteString`. Again we need to look through the [documentation](https://intersectMBO.github.io/plutus/master/plutus-tx/html/PlutusTx-Builtins-Class.html#v:stringToBuiltinByteString) to find the function we need (located in the `PlutusTx.Builtins.Class` module):
 
 ```haskell
 stringToBuiltinByteString :: String -> BuiltinByteString
