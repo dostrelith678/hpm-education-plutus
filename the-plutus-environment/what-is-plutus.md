@@ -16,9 +16,9 @@ _Contract API_ - a component that provides an interface for writing the off-chai
 
 _Plutus Application Backend (PAB)_ - a web server library that manages the state of Plutus contract instances and executes the off-chain components of Plutus applications. It does so by interacting with the _cardano-wallet_ backend and _cardano-node_ components while providing a client/application interface for the Plutus application. It is not really production-ready yet because only the hosted option is available, which means the backend must hold all the wallet keys. We will not be using PAB in this course but it is worth mentioning it for the future.
 
-_Various other libraries_ - provide a full framework for writing Plutus applications. A full list can be found here: [https://plutus-apps.readthedocs.io/en/latest/plutus/explanations/plutus-tools-component-descriptions.html#plutus-tools-in-development](https://plutus-apps.readthedocs.io/en/latest/plutus/explanations/plutus-tools-component-descriptions.html#plutus-tools-in-development).
+_Various other libraries_ - provide a full framework for writing Plutus applications. A full list can be found [here](https://plutus-apps.readthedocs.io/en/latest/plutus/explanations/plutus-tools-component-descriptions.html#plutus-tools-in-development).
 
-All these tools are located in the _plutus-apps_ repository ([https://github.com/input-output-hk/plutus-apps](https://github.com/input-output-hk/plutus-apps)).
+All these tools are located in the [_plutus-apps_ repository](https://github.com/intersectMBO/plutus-apps).
 
 <figure><img src="../.gitbook/assets/image.png" alt=""><figcaption><p>A high-level architecture of the Plutus Platform, with an emphasis on applications (<a href="https://ci.iog.io/build/65553/download/1/plutus.pdf">https://ci.iog.io/build/65553/download/1/plutus.pdf</a>).</p></figcaption></figure>
 
