@@ -64,7 +64,7 @@ The `cabal.project` file supports a variety of options that configure the detail
 
 ```haskell
 -- Custom repository for cardano haskell packages
--- See https://github.com/input-output-hk/cardano-haskell-packages on how to use CHaP in a Haskell project.
+-- See https://github.com/intersectMBO/cardano-haskell-packages on how to use CHaP in a Haskell project.
 repository cardano-haskell-packages
   url: https://intersectMBO.github.io/cardano-haskell-packages
   secure: True
@@ -115,7 +115,7 @@ A `source-repository-package` field provides a location from where to build a ce
 
 source-repository-package
   type: git
-  location: https://github.com/input-output-hk/plutus-apps.git
+  location: https://github.com/intersectMBO/plutus-apps.git
   tag: 65ddfa5d467ed64f8709d7db9faf96151942da82
   subdir:
     cardano-streaming

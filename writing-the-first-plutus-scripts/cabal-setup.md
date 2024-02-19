@@ -184,7 +184,7 @@ constraints:
 -- Waiting for plutus-apps CHaP to be published
 source-repository-package
   type: git
-  location: https://github.com/input-output-hk/plutus-apps.git
+  location: https://github.com/intersectMBO/plutus-apps.git
   tag: 65ddfa5d467ed64f8709d7db9faf96151942da82
   subdir:
     cardano-streaming
@@ -211,13 +211,13 @@ source-repository-package
 -- Direct dependency.
 source-repository-package
     type: git
-    location: https://github.com/input-output-hk/quickcheck-dynamic
+    location: https://github.com/intersectMBO/quickcheck-dynamic
     tag: c272906361471d684440f76c297e29ab760f6a1e
 
 -- Should follow cardano-wallet.
 source-repository-package
     type: git
-    location: https://github.com/input-output-hk/cardano-addresses
+    location: https://github.com/intersectMBO/cardano-addresses
     tag: b7273a5d3c21f1a003595ebf1e1f79c28cd72513
     subdir:
       -- cardano-addresses-cli
@@ -235,7 +235,7 @@ source-repository-package
 -- The current version is dated 2022/08/10
 source-repository-package
     type: git
-    location: https://github.com/input-output-hk/cardano-wallet
+    location: https://github.com/intersectMBO/cardano-wallet
     tag: 18a931648550246695c790578d4a55ee2f10463e
     subdir:
       lib/cli
@@ -250,10 +250,10 @@ source-repository-package
       lib/text-class
 
 -- This is needed because we rely on an unreleased feature
--- https://github.com/input-output-hk/cardano-ledger/pull/3111
+-- https://github.com/intersectMBO/cardano-ledger/pull/3111
 source-repository-package
     type: git
-    location: https://github.com/input-output-hk/cardano-ledger
+    location: https://github.com/intersectMBO/cardano-ledger
     tag: da3e9ae10cf9ef0b805a046c84745f06643583c2
     subdir:
       eras/alonzo/impl

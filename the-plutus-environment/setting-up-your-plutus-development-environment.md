@@ -2,7 +2,7 @@
 
 This guide will cover setting up the environment for writing and compiling Plutus scripts. It does not include any of the development components such as the PAB. The guide is written for the Ubuntu OS but uses Nix (as favoured by IOG) so it should be easily replicated on other systems.
 
-To set up a Plutus environment, we need a `cabal.project` file that will specify the dependencies required to develop Plutus scripts. It is important to note that both the [plutus](https://github.com/input-output-hk/plutus) and [plutus-apps](https://github.com/input-output-hk/plutus-apps) repositories are constantly under development with new releases. Combined with releases of cardano-node and cardano-wallet, this may cause various complications with regard to compatibility between the components.
+To set up a Plutus environment, we need a `cabal.project` file that will specify the dependencies required to develop Plutus scripts. It is important to note that both the [plutus](https://github.com/intersectMBO/plutus) and [plutus-apps](https://github.com/intersectMBO/plutus-apps) repositories are constantly under development with new releases. Combined with releases of cardano-node and cardano-wallet, this may cause various complications with regard to compatibility between the components.
 
 Therefore, we will use the following repository as a reference, which seems to be a stable and reasonably up-to-date way to get started: [https://github.com/james-iohk/plutus-scripts](https://github.com/james-iohk/plutus-scripts). Besides providing us with the `cabal.project` template, it also contains various Plutus scripts which serve as a good reference when learning.
 
@@ -11,7 +11,7 @@ In particular, the `cabal.project` file specifies a commit in the `plutus-apps` 
 Here are step-by-step instructions on how to get started:
 
 * Install Nix: the Package Manager from [https://nixos.org/download.html](https://nixos.org/download.html) (after installation we need to reload the terminal session or open a new one in order to have `nix` in our `$PATH`).
-* Configure Nix cache: Add the following lines to `/etc/nix/nix.conf` (from [https://github.com/input-output-hk/plutus-apps/blob/main/CONTRIBUTING.adoc](https://github.com/input-output-hk/plutus-apps/blob/main/CONTRIBUTING.adoc)):
+* Configure Nix cache: Add the following lines to `/etc/nix/nix.conf` (from [https://github.com/intersectMBO/plutus-apps/blob/main/CONTRIBUTING.adoc](https://github.com/intersectMBO/plutus-apps/blob/main/CONTRIBUTING.adoc)):
 
 ```nix
 substituters = https://cache.zw3rk.com https://cache.iog.io https://cache.nixos.org/
@@ -25,10 +25,10 @@ extra-experimental-features = nix-command flakes
 sudo pkill nix-daemon
 ```
 
-* Clone the `plutus-apps` repository: [https://github.com/input-output-hk/plutus-apps](https://github.com/input-output-hk/plutus-apps):
+* Clone the `plutus-apps` repository: [https://github.com/intersectMBO/plutus-apps](https://github.com/intersectMBO/plutus-apps):
 
 ```git
-git clone https://github.com/input-output-hk/plutus-apps
+git clone https://github.com/intersectMBO/plutus-apps
 ```
 
 * Clone the `plutus-scripts` repository as well: [https://github.com/james-iohk/plutus-scripts](https://github.com/james-iohk/plutus-scripts):

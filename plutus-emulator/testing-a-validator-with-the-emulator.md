@@ -50,7 +50,7 @@ The `@String` syntax requires the `TypeApplications` GHC extension to be activat
 Okay, now we need to create the first transaction. This is done by using the [`Ledger.Tx.Constraints`](https://intersectMBO.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html) module.
 
 {% hint style="info" %}
-The more [recent release of `plutus-apps`](https://github.com/input-output-hk/plutus-apps/releases/tag/v1.2.0) has the following change:
+The more [recent release of `plutus-apps`](https://github.com/intersectMBO/plutus-apps/releases/tag/v1.2.0) has the following change:
 
 * `plutus-ledger-constraints` was replaced with `plutus-tx-constraints`.
 
