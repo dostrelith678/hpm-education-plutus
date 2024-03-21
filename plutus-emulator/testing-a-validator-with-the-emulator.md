@@ -4,7 +4,7 @@ Now, we will test a validator that we created earlier with the Plutus emulator. 
 
 ### Writing the emulator trace
 
-Since `EmulatorTrace` is a monad, we will use [do-notation](https://haskell.hpmeducation.com/interactive-programming/sequencing-actions) to define its actions. In general, what we want to do is have a contract function written which describes the sequence of transactions that will be generated and submitted. We then call the [`activateContractWallet`](https://intersectMBO.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#v:activateContractWallet) function with a wallet (we can use `knownWallet 1` - corresponding to the first of the 10 default wallets) and the contract:
+Since `EmulatorTrace` is a monad, we will use [do-notation](https://haskell.hpmeducation.com/interactive-programming/sequencing-actions) to define its actions. In general, what we want to do is have a contract function that describes the sequence of transactions that will be generated and submitted. We then call the [`activateContractWallet`](https://intersectmbo.github.io/plutus-apps/main/plutus-contract/html/Plutus-Trace-Emulator.html#v:activateContractWallet) function with a wallet (we can use `knownWallet 1` - corresponding to the first of the 10 default wallets in the emulator) and the contract:
 
 ```haskell
 emulatorTrace :: EmulatorTrace ()
@@ -22,7 +22,7 @@ runTrace = runEmulatorTraceIO emulatorTrace
 
 ### Writing the contract
 
-To run a meaningful `EmulatorTrace`, we have to define a contract that can be used for emulation. The contract type is [`Contract w s e a`](https://intersectMBO.github.io/plutus-apps/main/plutus-contract/html/Plutus-Contract.html#t:Contract):
+To run a meaningful `EmulatorTrace`, we have to define a contract that can be used for emulation. The contract type is [`Contract w s e a`](https://intersectmbo.github.io/plutus-apps/main/plutus-contract/html/Plutus-Contract.html#t:Contract):
 
 * `w` is the _state_ type of the contract. The state can be updated from inside the contract and is generally used for communication between contract instances. It should not be confused with general logging which is always available through the `Contract.logInfo` function.
 * `s` stands for _schema_, a list of endpoints available to the contract
@@ -47,7 +47,7 @@ For simple examples, such as ours, we do not need to use a contract state, an en
 The `@String` syntax requires the `TypeApplications` GHC extension to be activated.
 {% endhint %}
 
-Okay, now we need to create the first transaction. This is done by using the [`Ledger.Tx.Constraints`](https://intersectMBO.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html) module.
+Okay, now we need to create the first transaction. This is done by using the [`Ledger.Tx.Constraints`](https://intersectmbo.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html) module.
 
 {% hint style="info" %}
 The more [recent release of `plutus-apps`](https://github.com/intersectMBO/plutus-apps/releases/tag/v1.2.0) has the following change:
@@ -61,7 +61,7 @@ import Ledger.Constraints as Constraints
 ```
 {% endhint %}
 
-We define the constraints of the transaction, i.e. what we want it to do, and the contract constructs a valid transaction based on its constraints. We want the first transaction to send some ADA to the script address along with a datum that will need to be guessed to spend it later, so we use the [`mustPayToOtherScriptWithDatumInTx`](https://intersectMBO.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html#v:mustPayToOtherScriptWithDatumInTx) function. After we submit the transaction we use [`awaitTxConfirmed`](https://intersectMBO.github.io/plutus-apps/main/plutus-contract/html/Plutus-Contract.html#v:awaitTxConfirmed) to make sure the transaction is accounted for on the emulated chain.
+We define the constraints of the transaction, i.e. what we want it to do, and the contract constructs a valid transaction based on its constraints. We want the first transaction to send some ADA to the script address along with a datum that will need to be guessed to spend it later, so we use the [`mustPayToOtherScriptWithDatumInTx`](https://intersectmbo.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html#v:mustPayToOtherScriptWithDatumInTx) function. After we submit the transaction we use [`awaitTxConfirmed`](https://intersectmbo.github.io/plutus-apps/main/plutus-contract/html/Plutus-Contract.html#v:awaitTxConfirmed) to make sure the transaction is accounted for on the emulated chain.
 
 ```haskell
 ...
@@ -83,7 +83,7 @@ valHash :: PSU.V2.ValidatorHash
 valHash = PSU.V2.validatorHash validator
 ```
 
-Note that this will get all the UTxOs and for simplicity (since we know there will always be only one), we can take just one with the `head` function. The `lookups` we need for this transaction are the `validator` itself, which we define with [`Constraints.plutusV2OtherScript`](https://intersectMBO.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html#v:plutusV2OtherScript) and the UTxO(s) that are sitting at the script address that we can get with [`Constraints.unspentOutputs`](https://intersectMBO.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html#v:unspentOutputs). We join these two monoidal values together with `<>` (`mappend`):
+Note that this will get all the UTxOs and for simplicity (since we know there will always be only one), we can take just one with the `head` function. The `lookups` we need for this transaction are the `validator` itself, which we define with [`Constraints.plutusV2OtherScript`](https://intersectmbo.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html#v:plutusV2OtherScript) and the UTxO(s) that are sitting at the script address that we can get with [`Constraints.unspentOutputs`](https://intersectmbo.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html#v:unspentOutputs). We join these two monoidal values together with `<>` (`mappend`):
 
 <pre class="language-haskell"><code class="lang-haskell"><strong>...
 </strong>    Contract.logInfo @String $ "Second transaction: spend script output with the right redeemer"
@@ -94,7 +94,7 @@ Note that this will get all the UTxOs and for simplicity (since we know there wi
               &#x3C;> Constraints.unspentOutputs utxos
 </code></pre>
 
-Now, we just need to construct the transaction with the correct redeemer that matches the datum (in our case just the `unitRedeemer`). We use the [`Constraints.mustSpendScriptOutput`](https://intersectMBO.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html#v:mustSpendScriptOutput) function and specify the output reference that we defined `oref` along with the `unitRedeemer`. We also must include the `unitDatum` in the transaction via [`Constraints.mustIncludeDatumInTx`](https://intersectMBO.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html#v:mustIncludeDatumInTx):
+Now, we just need to construct the transaction with the correct redeemer that matches the datum (in our case just the `unitRedeemer`). We use the [`Constraints.mustSpendScriptOutput`](https://intersectmbo.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html#v:mustSpendScriptOutput) function and specify the output reference that we defined `oref` along with the `unitRedeemer`. We also must include the `unitDatum` in the transaction via [`Constraints.mustIncludeDatumInTx`](https://intersectmbo.github.io/plutus-apps/main/plutus-tx-constraints/html/Ledger-Tx-Constraints.html#v:mustIncludeDatumInTx):
 
 <pre class="language-haskell"><code class="lang-haskell"><strong>...
 </strong>        tx2 =
@@ -102,7 +102,7 @@ Now, we just need to construct the transaction with the correct redeemer that ma
               &#x3C;> Constraints.mustIncludeDatumInTx unitDatum
 </code></pre>
 
-The final part is simply submitting the transaction with our given constraints. We use [`submitTxConstraintsWith`](https://intersectMBO.github.io/plutus-apps/main/plutus-contract/html/Plutus-Contract.html#v:submitTxConstraintsWith) and `awaitTxConfirmed`. Before we do, we can log the `oref` and `lookups` as mentioned before:
+The final part is simply submitting the transaction with our given constraints. We use [`submitTxConstraintsWith`](https://intersectmbo.github.io/plutus-apps/main/plutus-contract/html/Plutus-Contract.html#v:submitTxConstraintsWith) and `awaitTxConfirmed`. Before we do, we can log the `oref` and `lookups` as mentioned before:
 
 ```haskell
 ...
@@ -113,7 +113,7 @@ The final part is simply submitting the transaction with our given constraints. 
     Contract.logInfo @String $ "tx2 successfully submitted"
 ```
 
-There are a lot of different imports that we need to take care of for all of the above code to work, so below is a full reference of the imports. We have to import some extra modules from the standard `Prelude`, most importantly `Semigroup` as there seems to be some issue when using the emulator with the `PlutuxTx` version of `Semigroup`. We also need to hide the module from the `PlutusTx.Prelude`.&#x20;
+There are a lot of different imports that we need to take care of for all of the above code to work, so below is a full reference of the imports. We have to import some extra modules from the standard `Prelude`, most importantly `Semigroup` as there seems to be some issue when using the emulator with the `PlutuxTx` version of `Semigroup`. We also need to hide the module from the `PlutusTx.Prelude`.
 
 ```haskell
 import PlutusTx.Prelude hiding (Semigroup (..))
@@ -335,4 +335,3 @@ Lookups:
   }"
 "
 ```
-
